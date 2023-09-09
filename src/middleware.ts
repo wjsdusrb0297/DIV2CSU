@@ -32,6 +32,10 @@ async function handleAuth(request: NextRequest) {
       user = payload;
     } catch (e) {}
   }
+
+  if (!user && !request.nextUrl.pathname.startsWith('/auth')) {
+    return NextResponse.redirect(`${request.nextUrl.origin}/auth/login`);
+  }
   if (
     (user?.verified !== true || user?.deleted === true) &&
     !['/auth/needVerification', '/auth/rejected', '/auth/deleted'].some((url) =>
@@ -50,9 +54,6 @@ async function handleAuth(request: NextRequest) {
       return NextResponse.redirect(`${request.nextUrl.origin}/auth/deleted`);
     }
     return;
-  }
-  if (!user && !request.nextUrl.pathname.startsWith('/auth')) {
-    return NextResponse.redirect(`${request.nextUrl.origin}/auth/login`);
   }
   return NextResponse.next();
 }
