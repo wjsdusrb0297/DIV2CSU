@@ -89,7 +89,6 @@ export default function SignUpPage() {
             maxLength={30}
             placeholder='비밀번호'
             prefix={<LockOutlined />}
-            inputMode='numeric'
           />
         </Form.Item>
         <Form.Item<string>
@@ -100,7 +99,6 @@ export default function SignUpPage() {
           <Input.Password
             placeholder='비밀번호 재입력'
             prefix={<LockOutlined />}
-            inputMode='numeric'
           />
         </Form.Item>
         {error && <p className='text-red-400 mb-2'>{error}</p>}
