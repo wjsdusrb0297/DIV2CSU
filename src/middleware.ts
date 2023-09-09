@@ -44,7 +44,7 @@ async function handleAuth(request: NextRequest) {
   ) {
     if (user?.verified === null) {
       return NextResponse.redirect(
-        `${request.nextUrl.origin}/auth/needVerificataion`,
+        `${request.nextUrl.origin}/auth/needVerification`,
       );
     }
     if (user?.verified === false) {
