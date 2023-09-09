@@ -12,8 +12,6 @@ import {
   Popconfirm,
   Select,
   Spin,
-  Transfer,
-  Tree,
   message,
 } from 'antd';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -24,10 +22,10 @@ import {
   updatePassword,
   updatePermission,
 } from './actions';
-import { ALL_PERMISSIONS } from './signup/constants';
 import { fetchUserFromJwt } from '../actions';
 import _ from 'lodash';
 import { HelpModal, PasswordModal, PermissionsTransfer } from './components';
+import { WretchError } from 'wretch';
 
 export default function MyProfilePage({
   searchParams: { sn },
@@ -91,8 +89,9 @@ export default function MyProfilePage({
       .then(({ password }) => {
         setNewPassword(password);
       })
-      .catch((e: any) => {
-        if ((e as any)?.message) {
+      .catch((e: WretchError) => {
+        const error = e.json;
+        if (error?.message) {
           return message.error(JSON.parse((e as any).message)?.message);
         }
         message.error('초기화에 실패하였습니다');
