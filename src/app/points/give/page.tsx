@@ -19,7 +19,7 @@ export default function GivePointFormPage() {
   const [merit, setMerit] = useState(1);
   const [form] = Form.useForm();
   const router = useRouter();
-  const query = Form.useWatch('giverId', { form, preserve: true });
+  const query = Form.useWatch('receiverId', { form, preserve: true });
   const [options, setOptions] = useState<{ name: string; sn: string }[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -48,28 +48,30 @@ export default function GivePointFormPage() {
   }, [query]);
 
   const handleSubmit = useCallback(
-    async (form: any) => {
+    (form: any) => {
       if (!form?.givenAt?.$d) {
         return setError('날짜를 입력해주세요');
       }
-      try {
-        setLoading(true);
-        await givePoint({
-          ...form,
-          value: merit * form.value,
-          givenAt: (form.givenAt.$d as Date).toISOString(),
+      setLoading(true);
+      givePoint({
+        ...form,
+        value: merit * form.value,
+        givenAt: (form.givenAt.$d as Date).toISOString(),
+      })
+        .then(() => {
+          message.success('상벌점 성공적으로 했습니다');
+          router.push('/points');
+        })
+        .catch((e) => {
+          if ((e as any)?.message) {
+            setError(JSON.parse((e as any).message)?.message);
+          } else {
+            message.error(String(e));
+          }
+        })
+        .finally(() => {
+          setLoading(false);
         });
-        setLoading(false);
-        message.success('상벌점 성공적으로 했습니다');
-        router.back();
-      } catch (e) {
-        if ((e as any)?.message) {
-          setError(JSON.parse((e as any).message)?.message);
-        } else {
-          message.error(String(e));
-        }
-        setLoading(false);
-      }
     },
     [router, merit],
   );
