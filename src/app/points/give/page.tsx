@@ -21,7 +21,6 @@ export default function GivePointFormPage() {
   const router = useRouter();
   const query = Form.useWatch('receiverId', { form, preserve: true });
   const [options, setOptions] = useState<{ name: string; sn: string }[]>([]);
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [searching, setSearching] = useState(false);
 
@@ -50,7 +49,7 @@ export default function GivePointFormPage() {
   const handleSubmit = useCallback(
     (form: any) => {
       if (!form?.givenAt?.$d) {
-        return setError('날짜를 입력해주세요');
+        return message.error('날짜를 입력해주세요');
       }
       setLoading(true);
       givePoint({
@@ -64,7 +63,7 @@ export default function GivePointFormPage() {
         })
         .catch((e) => {
           if ((e as any)?.message) {
-            setError(JSON.parse((e as any).message)?.message);
+            message.error(JSON.parse((e as any).message)?.message);
           } else {
             message.error(String(e));
           }
@@ -145,11 +144,6 @@ export default function GivePointFormPage() {
             style={{ height: 150 }}
           />
         </Form.Item>
-        {error && (
-          <Form.Item>
-            <span className='text-red-600'>{error}</span>
-          </Form.Item>
-        )}
         <Form.Item>
           <Button
             ghost={false}
