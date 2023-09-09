@@ -205,7 +205,7 @@ export default function MyProfilePage({
       </div>
       {(sn == null || data?.sn === myData?.sub) && (
         <Form
-          className='mt-5'
+          rootClassName='mt-5'
           name='password'
           ref={formRef}
           onFinish={handlePasswordForm}
@@ -250,17 +250,21 @@ export default function MyProfilePage({
         </Form>
       )}
       <div className='my-1' />
-      <PermissionsTransfer
-        permissions={permissions as Permission[]}
-        onChange={(t) => setPermissions(t)}
-      />
-      {permissionAlertMessage && (
+      {data.type !== 'enlisted' && (
         <>
-          <div className='my-1' />
-          <Alert
-            type='warning'
-            message={permissionAlertMessage}
+          <PermissionsTransfer
+            permissions={permissions as Permission[]}
+            onChange={(t) => setPermissions(t)}
           />
+          {permissionAlertMessage && (
+            <>
+              <div className='my-1' />
+              <Alert
+                type='warning'
+                message={permissionAlertMessage}
+              />
+            </>
+          )}
         </>
       )}
       <div className='flex flex-row mt-5 justify-start'>
@@ -297,20 +301,22 @@ export default function MyProfilePage({
             <div className='mx-2' />
           </>
         )}
-        <Button
-          type='primary'
-          disabled={
-            sn == null ||
-            data?.sn === myData?.sub ||
-            _.isEqual(
-              originalData.current?.permissions.map(({ value }) => value),
-              permissions,
-            )
-          }
-          onClick={handleUpdatePermissions}
-        >
-          저장
-        </Button>
+        {data.type === 'nco' && (
+          <Button
+            type='primary'
+            disabled={
+              sn == null ||
+              data?.sn === myData?.sub ||
+              _.isEqual(
+                originalData.current?.permissions.map(({ value }) => value),
+                permissions,
+              )
+            }
+            onClick={handleUpdatePermissions}
+          >
+            저장
+          </Button>
+        )}
       </div>
       <FloatButton
         icon={<QuestionOutlined />}
