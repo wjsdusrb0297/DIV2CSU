@@ -18,7 +18,7 @@ async function handleAuth(request: NextRequest) {
       request.nextUrl.pathname.startsWith(url),
     )
   ) {
-    return NextResponse.next();
+    return NextResponse.next({ request });
   }
   const accessToken = request.cookies.get('auth.access_token')?.value;
   let user = null;
@@ -55,5 +55,5 @@ async function handleAuth(request: NextRequest) {
     }
     return;
   }
-  return NextResponse.next();
+  return NextResponse.next({ request });
 }
