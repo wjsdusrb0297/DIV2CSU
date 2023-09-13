@@ -25,7 +25,7 @@ export function HelpModal({ shown, onPressClose }: HelpModalProps) {
     >
       <List
         dataSource={[
-          'Admin 계정의 정보 변경(예: 비밀번호)이 필요할 경우, 웹사이트 관리자에게 문의해주세요',
+          'Admin 계정의 정보 변경(예: 권한)이 필요할 경우, 웹사이트 관리자에게 문의해주세요',
           '군번, 유형, 이름은 수정할 수 없습니다. 수정이 필요한 경우 웹사이트 관리자에게 문의해주세요',
           '권한이 Admin으로 승격이 필요한 경우, 웹사이트 관리자에게 문의해주세요',
         ]}
