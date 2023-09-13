@@ -17,4 +17,5 @@ export async function handleSignup(form: SignUpForm) {
     });
     redirect('/auth/needVerification');
   }
+  return data;
 }
