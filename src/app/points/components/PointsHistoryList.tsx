@@ -1,15 +1,16 @@
 import { api } from '@/lib/instance';
 import { PointCard } from './PointCard';
 import { Empty } from 'antd';
+import { Soldier } from '@/interfaces';
 
-export type PointsHistoryListProps = { sn?: string; page?: number };
+export type PointsHistoryListProps = { user?: Soldier; page?: number };
 
 export async function PointsHistoryList({
-  sn,
+  user,
   page = 0,
 }: PointsHistoryListProps) {
   const data = await api
-    .query({ page, sn })
+    .query({ page, sn: user?.sn })
     .get('/points/list')
     .json<{ id: string }[]>();
 
@@ -18,7 +19,13 @@ export async function PointsHistoryList({
       <div className='py-5 my-5'>
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description={<p>받은 상벌점이 없습니다</p>}
+          description={
+            <p>
+              {user?.type === 'enlisted'
+                ? '받은 상벌점이 없습니다'
+                : '부여한 상벌점이 없습니다'}
+            </p>
+          }
         />
       </div>
     );
