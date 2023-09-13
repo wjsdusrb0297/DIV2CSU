@@ -58,7 +58,9 @@ export default function SignUpPage() {
             style={{ flex: 1 }}
           >
             <Input
-              ref={(ref) => withMask('99-99999[999]')(ref?.input!)}
+              ref={(ref) =>
+                withMask('99-99999[999]', { placeholder: '' })(ref?.input!)
+              }
               type='text'
               placeholder='군번'
               prefix={<UserOutlined />}
