@@ -202,9 +202,15 @@ export default function MyProfilePage({
           />
         </div>
       </div>
+      <div className='my-3'>
+        {!(sn == null || data?.sn === myData?.sub) &&
+          _.intersection(['Admin', 'PointAdmin', 'ViewPoint'], myData.scope)
+            .length && (
+            <Button href={`/points?sn=${sn}`}>상점 내역 보기</Button>
+          )}
+      </div>
       {(sn == null || data?.sn === myData?.sub) && (
         <Form
-          rootClassName='mt-5'
           name='password'
           ref={formRef}
           onFinish={handlePasswordForm}

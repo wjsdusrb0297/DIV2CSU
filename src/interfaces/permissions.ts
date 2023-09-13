@@ -7,6 +7,7 @@ export type Permission =
   | 'GivePermissionUser'
   | 'ResetPasswordUser'
   | 'PointAdmin'
+  | 'ViewPoint'
   | 'GiveMeritPoint'
   | 'GiveLargeMeritPoint'
   | 'GiveDemeritPoint'
