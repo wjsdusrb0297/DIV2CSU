@@ -37,8 +37,6 @@ export default function LoginPage() {
           alt='Divison Logo'
         />
         <h1 className='mt-5 text-center font-black text-3xl'>
-          제2신속대응사단
-          <br />
           전투근무지원대대
         </h1>
       </div>
