@@ -31,7 +31,7 @@ function renderTitle(pathname: string) {
   if (pathname in title) {
     return title[pathname as keyof typeof title];
   }
-  return '전투근무지원대대';
+  return '병영생활 관리';
 }
 
 export function MenuLayout({
@@ -198,9 +198,7 @@ export function MenuLayout({
         </Layout.Header>
         <Layout.Content>{children}</Layout.Content>
         <Layout.Footer style={{ textAlign: 'center' }}>
-          <span className='text-black font-bold'>
-            전투근무지원대대 ©2023 키보드워리어
-          </span>
+          <span className='text-black font-bold'>©2023 키보드워리어</span>
         </Layout.Footer>
       </Layout>
     </Layout>

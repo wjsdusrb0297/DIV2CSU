@@ -36,9 +36,7 @@ export default function LoginPage() {
           src='https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/2division.png/640px-2division.png'
           alt='Divison Logo'
         />
-        <h1 className='mt-5 text-center font-black text-3xl'>
-          전투근무지원대대
-        </h1>
+        <h1 className='mt-5 text-center font-black text-3xl'>병영생활 관리</h1>
       </div>
       <Form
         onFinish={onSubmit}
