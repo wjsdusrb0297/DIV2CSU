@@ -117,7 +117,6 @@ export default function GivePointFormPage() {
         >
           <InputNumber
             min={1}
-            max={15}
             controls
             addonAfter='점'
             type='number'

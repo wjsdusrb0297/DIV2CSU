@@ -108,13 +108,10 @@ export default function RequestPointFormPage() {
           name='value'
           rules={[
             { required: true, message: '상벌점을 입력해주세요' },
-            // { min: 1, message: '최소 1점 이상이어야 합니다' },
-            // { max: 15, message: '최대 15점 입니다' },
           ]}
         >
           <InputNumber
             min={1}
-            max={15}
             controls
             addonAfter='점'
             type='number'
