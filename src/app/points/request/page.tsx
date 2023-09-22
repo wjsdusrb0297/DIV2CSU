@@ -56,7 +56,7 @@ export default function RequestPointFormPage() {
           givenAt: (form.givenAt.$d as Date).toISOString(),
         });
         setLoading(false);
-        message.success('상발점 요청을 성공적으로 했습니다');
+        message.success('상벌점 요청을 성공적으로 했습니다');
         router.back();
       } catch (e) {
         if ((e as any)?.message) {
