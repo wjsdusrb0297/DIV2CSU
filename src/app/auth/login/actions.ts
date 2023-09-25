@@ -11,8 +11,7 @@ export async function handleSubmit(sn: string, password: string) {
   let accessToken = null;
   try {
     const data = await api
-      .url('/auth/signIn')
-      .post({ sn, password })
+      .post({ sn, password }, '/auth/signIn')
       .json<{ accessToken?: string }>();
     accessToken = data?.accessToken;
   } catch (e) {
