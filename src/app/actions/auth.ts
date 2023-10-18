@@ -10,8 +10,33 @@ import jwt from 'jsonwebtoken';
 import z from 'zod';
 import { DatabaseError } from '@planetscale/database';
 import { Soldier } from '@/interfaces';
+import { currentSoldier } from './soldiers';
+import { hasPermission } from './utils';
 
 const AuthParams = Soldier.pick({ sn: true, password: true });
+
+const ValidateSoldierParams = Soldier.partial().pick({
+  deleted_at: true,
+  rejected_at: true,
+  verified_at: true,
+});
+
+export async function validateSoldier(
+  data?: z.infer<typeof ValidateSoldierParams> | null,
+) {
+  if (data == null) {
+    redirect('/auth/login');
+  }
+  if (data.deleted_at) {
+    redirect('/auth/deleted');
+  }
+  if (data.rejected_at) {
+    redirect('/auth/rejected');
+  }
+  if (!data.verified_at) {
+    redirect('/auth/needVerification');
+  }
+}
 
 export async function signIn({
   sn,
@@ -56,6 +81,7 @@ export async function signIn({
       accessToken: null,
     };
   }
+  await validateSoldier(data);
   const salt = data.password.slice(0, 32);
   const hashedPassword = data.password.slice(32);
   const hashed = pbkdf2Sync(password, salt, 104906, 64, 'sha256').toString(
@@ -71,9 +97,6 @@ export async function signIn({
     {
       name: data.name,
       sub: sn,
-      scope: (data.permissions ?? []).map(({ value }) => value),
-      verified: data.verified_at ? true : data.rejected_at ? false : null,
-      deleted: !!data.deleted_at,
       type: data.type,
     },
     process.env.JWT_SECRET_KEY!,
@@ -145,9 +168,6 @@ export async function signUp(
     {
       name: form.name,
       sub: form.sn,
-      scope: [],
-      verified: null,
-      deleted: false,
       type: form.type,
     },
     process.env.JWT_SECRET_KEY!,
@@ -162,4 +182,91 @@ export async function signUp(
     httpOnly: true,
   });
   redirect('/auth/needVerification');
+}
+
+export async function resetPassword({
+  sn,
+  oldPassword,
+  newPassword,
+  confirmation,
+}: {
+  sn: string;
+  oldPassword: string;
+  newPassword: string;
+  confirmation: string;
+}) {
+  const { sn: requestingSoldierSN } = await currentSoldier();
+  if (sn !== requestingSoldierSN) {
+    return { message: '본인만 비밀번호를 변경할 수 있습니다' };
+  }
+  if (newPassword !== confirmation) {
+    return { message: '새 비밀번호와 재입력이 일치하지 않습니다' };
+  }
+  if (!newPassword.trim()) {
+    return { message: '비밀번호는 최소 한자리입니다' };
+  }
+  const data = await kysely
+    .selectFrom('soldiers')
+    .where('sn', '=', sn)
+    .select('password')
+    .executeTakeFirstOrThrow();
+
+  const oldSalt = data.password.slice(0, 32);
+  const oldHashedPassword = data.password.slice(32);
+  const oldHashed = pbkdf2Sync(
+    oldPassword,
+    oldSalt,
+    104906,
+    64,
+    'sha256',
+  ).toString('base64');
+  if (oldHashedPassword !== oldHashed) {
+    return { message: '잘못된 비밀번호 입니다' };
+  }
+
+  const salt = randomBytes(24).toString('base64');
+  const hashed = pbkdf2Sync(
+    newPassword as string,
+    salt,
+    104906,
+    64,
+    'sha256',
+  ).toString('base64');
+
+  await kysely
+    .updateTable('soldiers')
+    .where('sn', '=', sn)
+    .set({ password: salt + hashed })
+    .executeTakeFirstOrThrow();
+}
+
+export async function resetPasswordForce(sn: string) {
+  const current = await currentSoldier();
+  if (
+    !hasPermission(
+      ['Admin', 'UserAdmin', 'ResetPasswordUser'],
+      current.permissions,
+    )
+  ) {
+    return { message: '비밀번호 초기화 권한이 없습니다', password: null };
+  }
+  if (current.sn === sn) {
+    return { message: '본인 비밀번호는 초기화 할 수 없습니다', password: null };
+  }
+  // 랜덤 비밀번호 생성
+  const password = randomBytes(6).toString('hex');
+  const salt = randomBytes(24).toString('base64');
+  const hashed = pbkdf2Sync(password, salt, 104906, 64, 'sha256').toString(
+    'base64',
+  );
+  try {
+    await kysely
+      .updateTable('soldiers')
+      .where('sn', '=', sn)
+      .set({ password: salt + hashed })
+      .executeTakeFirstOrThrow();
+    return { password, message: null };
+  } catch (e) {
+    return { password: null, message: '비밀번호 초기화에 실패했습니다' };
+  }
 }
