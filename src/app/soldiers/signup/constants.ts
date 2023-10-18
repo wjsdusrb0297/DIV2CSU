@@ -16,10 +16,6 @@ export const ALL_PERMISSIONS: {
     key: 'UserAdmin',
     title: '유저 관리자',
   },
-  ListUser: {
-    key: 'ListUser',
-    title: '유저 리스트 뷰어 권한',
-  },
   DeleteUser: {
     key: 'DeleteUser',
     title: '유저 삭제 권한',
