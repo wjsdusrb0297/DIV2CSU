@@ -1,4 +1,5 @@
 import z from 'zod';
+import { Permission } from './permissions';
 
 export const Soldier = z.object({
   sn: z
@@ -16,7 +17,10 @@ export const Soldier = z.object({
     .trim()
     .min(1, { message: '이름은 최소 1자리 입니다.' })
     .max(5, { message: '이름은 최대 5자리 입니다.' }),
-  verified_at: z.string().datetime().nullable(),
-  rejected_at: z.string().datetime().nullable(),
-  deleted_at: z.string().datetime().nullable(),
+  verified_at: z.date().nullable(),
+  rejected_at: z.date().nullable(),
+  deleted_at: z.date().nullable(),
+  permissions: z.array(Permission),
 });
+
+export type Soldier = z.infer<typeof Soldier>;

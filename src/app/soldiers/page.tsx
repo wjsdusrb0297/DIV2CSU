@@ -6,138 +6,110 @@ import {
   Alert,
   Button,
   FloatButton,
-  Form,
-  FormInstance,
   Input,
   Popconfirm,
   Select,
   Spin,
   message,
 } from 'antd';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import {
-  deleteUser,
+  currentSoldier,
+  deleteSoldier,
   fetchSoldier,
-  resetPassword,
-  updatePassword,
-  updatePermission,
-} from './actions';
-import { fetchUserFromJwt } from '../actions';
+  resetPasswordForce,
+  updatePermissions,
+} from '../actions';
 import _ from 'lodash';
-import { HelpModal, PasswordModal, PermissionsTransfer } from './components';
-import { WretchError } from 'wretch';
+import {
+  HelpModal,
+  PasswordForm,
+  PasswordModal,
+  PermissionsTransfer,
+} from './components';
 
 export default function MyProfilePage({
   searchParams: { sn },
 }: {
   searchParams: { sn: string };
 }) {
-  const [myData, setMyData] =
-    useState<Awaited<ReturnType<typeof fetchUserFromJwt> | null>>(null);
-  const [data, setData] = useState<Soldier | null>(null);
-  const [helpShown, setHelpShwon] = useState(false);
-  const [permissions, setPermissions] = useState<string[]>([]);
-  const originalData = useRef<Soldier | null>(null);
-  const formRef = useRef<FormInstance>(null);
-  const [newPassword, setNewPassword] = useState<string | null>(null);
-  const [mutatingPassword, setMutatingPassword] = useState(false);
-  const [passwordMutateError, setPasswordMutateError] = useState<string | null>(
+  const [mySoldier, setMySoldier] = useState<Omit<Soldier, 'password'> | null>(
     null,
   );
+  const [targetSoldier, setTargetSoldier] = useState<Omit<
+    Soldier,
+    'password'
+  > | null>(null);
+  const data = targetSoldier ?? mySoldier;
+  const isViewingMine =
+    targetSoldier == null || mySoldier?.sn === targetSoldier.sn;
+  const [helpShown, setHelpShwon] = useState(false);
+  const [permissions, setPermissions] = useState<string[]>([]);
+  const [newPassword, setNewPassword] = useState<string | null>(null);
+
+  useLayoutEffect(() => {
+    Promise.all([currentSoldier(), sn ? fetchSoldier(sn) : null]).then(
+      ([newMySoldier, newTargetSoldier]) => {
+        setMySoldier(newMySoldier as any);
+        setPermissions(
+          newTargetSoldier?.permissions ?? newMySoldier.permissions,
+        );
+        setTargetSoldier(newTargetSoldier as any);
+      },
+    );
+  }, [sn]);
 
   const handleUpdatePermissions = useCallback(() => {
-    updatePermission(sn, permissions as Permission[])
-      .then(() => {
-        if (originalData.current?.permissions) {
-          originalData.current.permissions = permissions.map((p) => ({
-            value: p as Permission,
-          }));
-        }
-        setData(
-          (state) =>
-            ({
-              ...state,
-              permissions: permissions.map((p) => ({ value: p })),
-            } as any),
-        );
-        return message.success('권한을 성공적으로 변경하였습니다');
-      })
-      .catch((e) => {
-        if ((e as any)?.message) {
-          return message.error(JSON.parse((e as any).message)?.message);
-        }
-        message.error('권한 변경에 실패하였습니다');
-      });
+    updatePermissions({ sn, permissions }).then(({ message: newMessage }) => {
+      if (newMessage != null) {
+        return message.error(newMessage);
+      }
+      setTargetSoldier(
+        (state) =>
+          ({
+            ...state,
+            permissions: permissions,
+          } as any),
+      );
+      return message.success('권한을 성공적으로 변경하였습니다');
+    });
   }, [sn, permissions]);
 
   const permissionAlertMessage = useMemo(() => {
-    if (sn == null || data?.sn === myData?.sub) {
+    if (isViewingMine) {
       return '본인 권한은 수정할 수 없습니다';
     }
     if (
-      !_.intersection(
-        myData?.scope ?? ['Admin', 'UserAdmin', 'GivePermissionUser'],
-      )
+      !_.intersection(mySoldier?.permissions ?? [], [
+        'Admin',
+        'UserAdmin',
+        'GivePermissionUser',
+      ])
     ) {
       return '권한 변경 권한이 없습니다';
     }
     return null;
-  }, [data, myData, sn]);
+  }, [isViewingMine, mySoldier?.permissions]);
 
   const handleResetPassword = useCallback(() => {
-    resetPassword(sn)
-      .then(({ password }) => {
-        setNewPassword(password);
-      })
-      .catch((e: WretchError) => {
-        const error = e.json;
-        if (error?.message) {
-          return message.error(JSON.parse((e as any).message)?.message);
-        }
-        message.error('초기화에 실패하였습니다');
-      });
-  }, [sn]);
-
-  const handlePasswordForm = useCallback(
-    (form: {
-      password: string;
-      newPassword: string;
-      newPasswordConfirmation: string;
-    }) => {
-      if (form.newPassword !== form.newPasswordConfirmation) {
-        return setPasswordMutateError(
-          '새 비밀번호와 재입력이 일치하지 않습니다',
-        );
+    if (!isViewingMine) {
+      return;
+    }
+    resetPasswordForce(sn).then(({ password, message: newMessage }) => {
+      if (newMessage) {
+        return message.error(newMessage);
       }
-      if (form.password === form.newPassword) {
-        return setPasswordMutateError('변경하려는 비밀번호가 이전과 같습니다');
-      }
-      setMutatingPassword(true);
-      updatePassword(form.password, form.newPassword)
-        .then(() => {
-          message.success('비밀번호를 변경하였습니다');
-          formRef.current?.resetFields();
-          setPasswordMutateError(null);
-        })
-        .catch((e) => {
-          if ((e as any)?.message) {
-            return setPasswordMutateError(
-              JSON.parse((e as any).message)?.message,
-            );
-          }
-          message.error('알 수 없는 오류가 발생했습니다');
-        })
-        .finally(() => {
-          setMutatingPassword(false);
-        });
-    },
-    [],
-  );
+      setNewPassword(password);
+    });
+  }, [sn, isViewingMine]);
 
   const handleUserDelete = useCallback(() => {
-    deleteUser(sn, data?.deleted_at == null)
-      .then(() => {
-        setData((state) => {
+    deleteSoldier({ sn, value: data?.deleted_at == null }).then(
+      ({ message: newMessage }) => {
+        if (newMessage) {
+          message.error(newMessage);
+        }
+        setTargetSoldier((state) => {
           if (state == null) {
             return null;
           }
@@ -146,25 +118,14 @@ export default function MyProfilePage({
           );
           return {
             ...state,
-            deleted_at: state.deleted_at == null ? 'deleted' : null,
+            deleted_at: state.deleted_at == null ? new Date() : null,
           };
         });
-      })
-      .catch((e) => {
-        message.error('유저 삭제를 실패하였습니다');
-      });
+      },
+    );
   }, [sn, data?.deleted_at]);
 
-  useEffect(() => {
-    Promise.all([fetchUserFromJwt(), fetchSoldier(sn)]).then(([myD, d]) => {
-      setMyData(myD);
-      setData(d);
-      setPermissions(d.permissions.map(({ value }) => value));
-      originalData.current = d;
-    });
-  }, [sn]);
-
-  if (data == null || myData == null) {
+  if (data == null) {
     return (
       <div className='flex flex-1 min-h-full justify-center items-center'>
         <Spin indicator={<LoadingOutlined spin />} />
@@ -179,7 +140,7 @@ export default function MyProfilePage({
           <span>유형</span>
           <Select
             disabled
-            value={data.type}
+            value={data?.type}
           >
             <Select.Option value='enlisted'>용사</Select.Option>
             <Select.Option value='nco'>간부</Select.Option>
@@ -189,7 +150,7 @@ export default function MyProfilePage({
         <div>
           <span>군번</span>
           <Input
-            value={data.sn}
+            value={data?.sn}
             disabled
           />
         </div>
@@ -197,65 +158,25 @@ export default function MyProfilePage({
         <div>
           <span>이름</span>
           <Input
-            value={data.name}
+            value={data?.name}
             disabled
           />
         </div>
       </div>
       <div className='my-3'>
-        {!(sn == null || data?.sn === myData?.sub) &&
-          _.intersection(['Admin', 'PointAdmin', 'ViewPoint'], myData.scope)
-            .length && (
-            <Button href={`/points?sn=${sn}`}>상점 내역 보기</Button>
+        {!isViewingMine &&
+          _.intersection(
+            ['Admin', 'PointAdmin', 'ViewPoint'],
+            mySoldier?.permissions,
+          ).length && (
+            <Button href={`/points?sn=${targetSoldier.sn}`}>
+              상점 내역 보기
+            </Button>
           )}
       </div>
-      {(sn == null || data?.sn === myData?.sub) && (
-        <Form
-          name='password'
-          ref={formRef}
-          onFinish={handlePasswordForm}
-        >
-          <Form.Item
-            label='현재 비밀번호'
-            name='password'
-            required
-          >
-            <Input.Password />
-          </Form.Item>
-          <Form.Item
-            label='새 비밀번호'
-            name='newPassword'
-            rules={[
-              { required: true, message: '비밀번호를 입력해주세요' },
-              { min: 6, message: '최소 6자리 입니다' },
-              { max: 30, message: '최대 30자리 입니다' },
-            ]}
-          >
-            <Input.Password />
-          </Form.Item>
-          <Form.Item
-            label='새 비밀번호 재입력'
-            name='newPasswordConfirmation'
-            required
-          >
-            <Input.Password />
-          </Form.Item>
-          {passwordMutateError && (
-            <span className='text-red-400 m-2'>{passwordMutateError}</span>
-          )}
-          <Form.Item>
-            <Button
-              type='primary'
-              htmlType='submit'
-              loading={mutatingPassword}
-            >
-              변경
-            </Button>
-          </Form.Item>
-        </Form>
-      )}
+      {isViewingMine && <PasswordForm sn={sn} />}
       <div className='my-1' />
-      {data.type !== 'enlisted' && (
+      {data?.type !== 'enlisted' && (
         <>
           <PermissionsTransfer
             permissions={permissions as Permission[]}
@@ -273,7 +194,7 @@ export default function MyProfilePage({
         </>
       )}
       <div className='flex flex-row mt-5 justify-start'>
-        {!(sn == null || data?.sn === myData?.sub) && (
+        {!isViewingMine && (
           <>
             <Popconfirm
               title='초기화'
@@ -288,34 +209,29 @@ export default function MyProfilePage({
             <div className='mx-2' />
           </>
         )}
-        {!(sn == null || data?.sn === myData?.sub) && (
+        {!isViewingMine && (
           <>
             <Popconfirm
               title={`${
-                data.deleted_at == null ? '삭제' : '복원'
+                data?.deleted_at == null ? '삭제' : '복원'
               }하시겠습니까?`}
               cancelText='취소'
-              okText={data.deleted_at == null ? '삭제' : '복원'}
+              okText={data?.deleted_at == null ? '삭제' : '복원'}
               okType='danger'
               onConfirm={handleUserDelete}
             >
               <Button danger>
-                {data.deleted_at == null ? '삭제' : '복원'}
+                {data?.deleted_at == null ? '삭제' : '복원'}
               </Button>
             </Popconfirm>
             <div className='mx-2' />
           </>
         )}
-        {data.type === 'nco' && (
+        {data?.type === 'nco' && (
           <Button
             type='primary'
             disabled={
-              sn == null ||
-              data?.sn === myData?.sub ||
-              _.isEqual(
-                originalData.current?.permissions.map(({ value }) => value),
-                permissions,
-              )
+              isViewingMine || _.isEqual(targetSoldier.permissions, permissions)
             }
             onClick={handleUpdatePermissions}
           >

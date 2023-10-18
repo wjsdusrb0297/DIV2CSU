@@ -2,26 +2,20 @@
 
 import { Pagination } from 'antd';
 import { useRouter } from 'next/navigation';
-import { useCallback, useLayoutEffect, useState } from 'react';
-import { fetchHistoryCounts } from '../actions';
+import { useCallback } from 'react';
 
 export type PointListPaginationProps = {
-  sn?: string;
+  sn: string;
+  total: number;
   page?: number;
 };
 
 export function PointListPagination({
   sn,
+  total,
   page = 1,
 }: PointListPaginationProps) {
   const router = useRouter();
-  const [total, setTotal] = useState(1);
-
-  useLayoutEffect(() => {
-    fetchHistoryCounts().then((d) => {
-      setTotal(parseInt(d.count, 10));
-    });
-  });
 
   const onChange = useCallback(
     (page: number) => {

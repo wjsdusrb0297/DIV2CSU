@@ -2,28 +2,28 @@
 
 import { Button, Card, Popconfirm, Skeleton, message } from 'antd';
 import { useCallback, useLayoutEffect, useState } from 'react';
-import { deletePoint, fetchPoint } from '../actions';
-import { FetchPointData } from '../interfaces';
 import moment from 'moment';
 import { ArrowRightOutlined, DeleteOutlined } from '@ant-design/icons';
+import { deletePoint, fetchPoint } from '@/app/actions';
 
 export type PointCardProps = {
   pointId: string;
 };
 
 export function PointCard({ pointId }: PointCardProps) {
-  const [point, setPoint] = useState<FetchPointData | null>(null);
+  const [point, setPoint] = useState<
+    Awaited<ReturnType<typeof fetchPoint>> | undefined
+  >(undefined);
   const [deleted, setDeleted] = useState(false);
 
   const onDelete = useCallback(() => {
-    deletePoint(pointId)
-      .then(() => {
+    deletePoint(pointId).then(({ message: newMessage }) => {
+      if (newMessage == null) {
         message.success('삭제하였습니다');
-        setDeleted(true);
-      })
-      .catch((e) => {
-        message.error('삭제에 실패하였습니다');
-      });
+        return setDeleted(true);
+      }
+      message.error(newMessage);
+    });
   }, [pointId]);
 
   useLayoutEffect(() => {
@@ -82,8 +82,7 @@ export function PointCard({ pointId }: PointCardProps) {
           </div>
           {point?.rejected_at ||
           point?.verified_at ||
-          point?.rejected_reason ||
-          point?.used_id ? null : (
+          point?.rejected_reason ? null : (
             <Popconfirm
               title='삭제하시겠습니까?'
               okText='삭제'

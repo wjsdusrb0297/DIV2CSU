@@ -12,8 +12,8 @@ import {
 } from 'antd';
 import locale from 'antd/es/date-picker/locale/ko_KR';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { requestPoint, searchPossiblePointsGiver } from './actions';
 import { useRouter } from 'next/navigation';
+import { createPoint, searchPointsGiver } from '@/app/actions';
 
 export default function RequestPointFormPage() {
   const [merit, setMerit] = useState(1);
@@ -37,9 +37,9 @@ export default function RequestPointFormPage() {
 
   useEffect(() => {
     setSearching(true);
-    searchPossiblePointsGiver(query).then((value) => {
-      setSearching(false);
+    searchPointsGiver(query).then((value) => {
       setOptions(value as any);
+      setSearching(false);
     });
   }, [query]);
 
@@ -48,22 +48,22 @@ export default function RequestPointFormPage() {
       if (!form?.givenAt?.$d) {
         setError('날짜를 입력해주세요');
       }
-      try {
-        setLoading(true);
-        await requestPoint({
-          ...form,
-          value: merit * form.value,
-          givenAt: (form.givenAt.$d as Date).toISOString(),
+      setLoading(true);
+      createPoint({
+        ...form,
+        value: merit * form.value,
+        givenAt: (form.givenAt.$d as Date).toISOString(),
+      })
+        .then(({ message: newMessage }) => {
+          if (newMessage) {
+            return setError(newMessage);
+          }
+          message.success('상벌점 요청을 성공적으로 했습니다');
+          router.back();
+        })
+        .finally(() => {
+          setLoading(false);
         });
-        setLoading(false);
-        message.success('상벌점 요청을 성공적으로 했습니다');
-        router.back();
-      } catch (e) {
-        if ((e as any)?.message) {
-          setError(JSON.parse((e as any).message)?.message);
-        }
-        setLoading(false);
-      }
     },
     [router, merit],
   );
@@ -106,9 +106,7 @@ export default function RequestPointFormPage() {
         </Form.Item>
         <Form.Item<number>
           name='value'
-          rules={[
-            { required: true, message: '상벌점을 입력해주세요' },
-          ]}
+          rules={[{ required: true, message: '상벌점을 입력해주세요' }]}
         >
           <InputNumber
             min={1}

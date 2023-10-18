@@ -11,9 +11,10 @@ import {
   message,
 } from 'antd';
 import locale from 'antd/es/date-picker/locale/ko_KR';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { checkIfNco, givePoint, searchPossiblePointsReceiver } from './actions';
+import { useCallback, useEffect, useState } from 'react';
+import { checkIfNco } from './actions';
 import { useRouter } from 'next/navigation';
+import { createPoint, searchPointsReceiver } from '@/app/actions';
 
 export default function GivePointFormPage() {
   const [merit, setMerit] = useState(1);
@@ -40,7 +41,7 @@ export default function GivePointFormPage() {
 
   useEffect(() => {
     setSearching(true);
-    searchPossiblePointsReceiver(query).then((value) => {
+    searchPointsReceiver(query).then((value) => {
       setSearching(false);
       setOptions(value as any);
     });
@@ -52,21 +53,17 @@ export default function GivePointFormPage() {
         return message.error('날짜를 입력해주세요');
       }
       setLoading(true);
-      givePoint({
+      createPoint({
         ...form,
         value: merit * form.value,
         givenAt: (form.givenAt.$d as Date).toISOString(),
       })
-        .then(() => {
+        .then(({ message: newMessage }) => {
+          if (newMessage) {
+            return message.error(newMessage);
+          }
           message.success('상벌점 성공적으로 했습니다');
           router.push('/points');
-        })
-        .catch((e) => {
-          if ((e as any)?.message) {
-            message.error(JSON.parse((e as any).message)?.message);
-          } else {
-            message.error(String(e));
-          }
         })
         .finally(() => {
           setLoading(false);

@@ -5,6 +5,7 @@ import { Card, Input, Pagination, Skeleton } from 'antd';
 import { ChangeEventHandler, useCallback, useEffect, useState } from 'react';
 import { fetchAllSoldiers } from './actions';
 import { useRouter } from 'next/navigation';
+import { listSoldiers } from '@/app/actions';
 
 export default function ManageSoldiersPage({
   searchParams,
@@ -34,10 +35,10 @@ export default function ManageSoldiersPage({
   );
 
   useEffect(() => {
-    fetchAllSoldiers(query, parseInt(searchParams.page || '1', 10)).then(
-      (d) => {
-        setData(d[0]);
-        setCount(parseInt(d[1].count, 10));
+    listSoldiers({ query, page: parseInt(searchParams.page || '1', 10) }).then(
+      ({ count, data }) => {
+        setData(data);
+        setCount(count);
       },
     );
   }, [query, searchParams.page]);
