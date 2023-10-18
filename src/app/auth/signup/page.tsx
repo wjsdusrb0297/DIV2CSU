@@ -6,28 +6,23 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
 import { withMask } from 'use-mask-input';
 import { SignUpForm } from './interfaces';
-import { handleSignup } from './actions';
+import { signUp } from '@/app/actions';
 
 export default function SignUpPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const onFinish = useCallback((form: SignUpForm) => {
+  const onFinish = useCallback(async (form: SignUpForm) => {
     if (form.password !== form.passwordConfirmation) {
       return setError('비밀번호를 다시 한번 확인해주세요');
     }
     setLoading(true);
-    handleSignup(form)
-      .then(() => {
-        setError(null);
-      })
-      .catch(() => {
-        message.error('회원가입에 실패하였습니다');
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    const data = await signUp(form);
+    if (data.message) {
+      message.error('회원가입에 실패하였습니다');
+    }
+    setLoading(false);
   }, []);
 
   return (
