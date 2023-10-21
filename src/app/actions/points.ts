@@ -3,7 +3,6 @@
 import { currentSoldier, fetchSoldier } from './soldiers';
 import { kysely } from './kysely';
 import { checkIfSoldierHasPermission } from './utils';
-import { sql } from 'kysely';
 
 export async function fetchPoint(pointId: string) {
   return kysely
@@ -224,4 +223,8 @@ export async function createPoint({
   } catch (e) {
     return { message: '알 수 없는 오류가 발생했습니다' };
   }
+}
+
+export async function fetchPointTemplates() {
+  return kysely.selectFrom('point_templates').selectAll().execute();
 }
