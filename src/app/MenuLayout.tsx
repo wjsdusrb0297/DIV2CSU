@@ -145,7 +145,11 @@ export function MenuLayout({
 
   const onClickMenu = useCallback(() => setCollapsed((state) => !state), []);
 
-  if (data == null || pathname.startsWith('/auth')) {
+  if (data == null) {
+    if (pathname.startsWith('/auth')) {
+      return children;
+    }
+    router.replace('/auth/login');
     return children;
   }
 
