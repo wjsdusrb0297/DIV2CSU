@@ -23,12 +23,12 @@ export async function listPoints(sn: string, page: number = 0) {
     .executeTakeFirstOrThrow();
   const query = kysely
     .selectFrom('points')
-    .where(type === 'enlisted' ? 'receiver_id' : 'giver_id', '=', sn)
-    .orderBy('created_at desc');
+    .where(type === 'enlisted' ? 'receiver_id' : 'giver_id', '=', sn);
 
   const [data, { count }] = await Promise.all([
     query
-      .select('id')
+      .orderBy('created_at desc')
+      .select(['id'])
       .limit(20)
       .offset(Math.min(0, page) * 20)
       .execute(),
