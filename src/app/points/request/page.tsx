@@ -14,6 +14,7 @@ import locale from 'antd/es/date-picker/locale/ko_KR';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createPoint, searchPointsGiver } from '@/app/actions';
+import { PointTemplatesInput } from '../components';
 
 export default function RequestPointFormPage() {
   const [merit, setMerit] = useState(1);
@@ -47,6 +48,9 @@ export default function RequestPointFormPage() {
     async (form: any) => {
       if (!form?.givenAt?.$d) {
         setError('날짜를 입력해주세요');
+      }
+      if (form.value <= 0) {
+        setError('상벌점 점수는 0점 초과여야 합니다');
       }
       setLoading(true);
       createPoint({
@@ -85,6 +89,17 @@ export default function RequestPointFormPage() {
             picker='date'
             inputReadOnly
             locale={locale}
+          />
+        </Form.Item>
+        <Form.Item<string>>
+          <PointTemplatesInput
+            onChange={(reason, value) => {
+              form.setFieldValue('reason', reason);
+              if (value) {
+                setMerit(() => (value > 0 ? 1 : -1));
+                form.setFieldValue('value', Math.abs(value));
+              }
+            }}
           />
         </Form.Item>
         <Form.Item<string>

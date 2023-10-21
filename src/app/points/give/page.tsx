@@ -15,6 +15,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { checkIfNco } from './actions';
 import { useRouter } from 'next/navigation';
 import { createPoint, searchPointsReceiver } from '@/app/actions';
+import { PointTemplatesInput } from '../components';
 
 export default function GivePointFormPage() {
   const [merit, setMerit] = useState(1);
@@ -51,6 +52,9 @@ export default function GivePointFormPage() {
     (form: any) => {
       if (!form?.givenAt?.$d) {
         return message.error('날짜를 입력해주세요');
+      }
+      if (form.value <= 0) {
+        return message.error('상벌점 점수는 0점 초과여야 합니다');
       }
       setLoading(true);
       createPoint({
@@ -89,6 +93,17 @@ export default function GivePointFormPage() {
             picker='date'
             inputReadOnly
             locale={locale}
+          />
+        </Form.Item>
+        <Form.Item<string>>
+          <PointTemplatesInput
+            onChange={(reason, value) => {
+              form.setFieldValue('reason', reason);
+              if (value) {
+                setMerit(() => (value > 0 ? 1 : -1));
+                form.setFieldValue('value', Math.abs(value));
+              }
+            }}
           />
         </Form.Item>
         <Form.Item<string>
