@@ -2,7 +2,7 @@
 
 import { Permission } from '@/interfaces';
 import jwt from 'jsonwebtoken';
-import { jsonArrayFrom } from 'kysely/helpers/mysql';
+import { jsonArrayFrom } from 'kysely/helpers/postgres';
 import { cookies } from 'next/headers';
 import { cache } from 'react';
 import { validateSoldier } from './auth';

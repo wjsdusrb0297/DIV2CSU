@@ -5,7 +5,7 @@ import { DatabaseError } from '@planetscale/database';
 import { pbkdf2Sync, randomBytes } from 'crypto';
 import jwt from 'jsonwebtoken';
 import { NoResultError } from 'kysely';
-import { jsonArrayFrom } from 'kysely/helpers/mysql';
+import { jsonArrayFrom } from 'kysely/helpers/postgres';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import z from 'zod';
@@ -70,6 +70,7 @@ export async function signIn({
       ])
       .executeTakeFirstOrThrow();
   } catch (e) {
+    console.log({ e });
     if (e instanceof NoResultError) {
       return {
         message: '존재하지 않는 사용자입니다',
