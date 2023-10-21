@@ -4,3 +4,4 @@ export * from './PointListPagination';
 export * from './PointCard';
 export * from './PointRequestCard';
 export * from './PointRequestList';
+export * from './PointTemplatesInput';
