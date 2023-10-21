@@ -3,6 +3,7 @@
 import { currentSoldier, fetchSoldier } from './soldiers';
 import { kysely } from './kysely';
 import { checkIfSoldierHasPermission } from './utils';
+import { sql } from 'kysely';
 
 export async function fetchPoint(pointId: string) {
   return kysely
@@ -126,30 +127,24 @@ export async function fetchPointSummary(sn: string) {
   const usedPointsQuery = kysely
     .selectFrom('used_points')
     .where('user_id', '=', sn);
-  const [meritData, demeritData, usedMeritData, usedDemeritData] =
-    await Promise.all([
-      pointsQuery
-        .where('value', '>', 0)
-        .select((eb) => eb.fn.sum<string>('value').as('value'))
-        .executeTakeFirst(),
-      pointsQuery
-        .where('value', '<', 0)
-        .select((eb) => eb.fn.sum<string>('value').as('value'))
-        .executeTakeFirst(),
-      usedPointsQuery
-        .where('value', '>', 0)
-        .select((eb) => eb.fn.sum<string>('value').as('value'))
-        .executeTakeFirst(),
-      usedPointsQuery
-        .where('value', '<', 0)
-        .select((eb) => eb.fn.sum<string>('value').as('value'))
-        .executeTakeFirst(),
-    ]);
+  const [meritData, demeritData, usedMeritData] = await Promise.all([
+    pointsQuery
+      .where('value', '>', 0)
+      .select((eb) => eb.fn.sum<string>('value').as('value'))
+      .executeTakeFirst(),
+    pointsQuery
+      .where('value', '<', 0)
+      .select((eb) => eb.fn.sum<string>('value').as('value'))
+      .executeTakeFirst(),
+    usedPointsQuery
+      .where('value', '>', 0)
+      .select((eb) => eb.fn.sum<string>('value').as('value'))
+      .executeTakeFirst(),
+  ]);
   return {
     merit: parseInt(meritData?.value ?? '0', 10),
     demerit: parseInt(demeritData?.value ?? '0', 10),
     usedMerit: parseInt(usedMeritData?.value ?? '0', 10),
-    usedDemerit: parseInt(usedDemeritData?.value ?? '0', 10),
   };
 }
 

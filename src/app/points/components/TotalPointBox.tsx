@@ -25,7 +25,9 @@ export function TotalPointBox({ user }: { user: Soldier }) {
           {data ? (
             <Statistic
               title='잔여 상점/총 상점'
-              value={`${data.merit - data.usedMerit}/${data.merit}점`}
+              value={`${data.merit - data.demerit - data.usedMerit}/${
+                data.merit
+              }점`}
               prefix={<CheckOutlined />}
               valueStyle={{ color: '#cf1322' }}
             />
@@ -40,8 +42,8 @@ export function TotalPointBox({ user }: { user: Soldier }) {
         >
           {data ? (
             <Statistic
-              title='잔여 벌점/총 벌점'
-              value={`${data.demerit - data.usedDemerit}/${data.demerit}점`}
+              title='총 벌점'
+              value={`${data.demerit}점`}
               prefix={<CloseOutlined />}
               valueStyle={{ color: '#3f8600' }}
             />
