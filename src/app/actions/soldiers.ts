@@ -186,7 +186,8 @@ export async function searchPointsGiver(query: string) {
               'PointAdmin',
               'Admin',
             ])
-            .select('permissions.value'),
+            .select('permissions.value')
+            .groupBy('permissions.value'),
         ),
       ]),
     )
