@@ -1,10 +1,10 @@
 'use client';
 
-import { Button, Card, Popconfirm, Skeleton, message } from 'antd';
-import { useCallback, useLayoutEffect, useState } from 'react';
-import moment from 'moment';
-import { ArrowRightOutlined, DeleteOutlined } from '@ant-design/icons';
 import { deletePoint, fetchPoint } from '@/app/actions';
+import { ArrowRightOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Button, Card, Popconfirm, Skeleton, message } from 'antd';
+import moment from 'moment';
+import { useCallback, useLayoutEffect, useState } from 'react';
 
 export type PointCardProps = {
   pointId: string;

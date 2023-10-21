@@ -1,9 +1,9 @@
 'use client';
 
+import { verifySoldier } from '@/app/actions';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { App, Button, Card, Popconfirm } from 'antd';
 import { useCallback, useState } from 'react';
-import { verifySoldier } from '@/app/actions';
 
 export type UnverifiedUserCardProps = {
   name: string;

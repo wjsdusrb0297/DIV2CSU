@@ -1,8 +1,8 @@
-import './globals.css';
 import type { Metadata } from 'next';
-import { AntDesignRegistry } from './registry';
 import { MenuLayout } from './MenuLayout';
 import { unauthenticated_currentSoldier } from './actions';
+import './globals.css';
+import { AntDesignRegistry } from './registry';
 
 export const metadata: Metadata = {
   title: '병영생활 관리',

@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
-import { useServerInsertedHTML } from 'next/navigation';
 import { StyleProvider, createCache, extractStyle } from '@ant-design/cssinjs';
 import Entity from '@ant-design/cssinjs/lib/Cache';
+import { useServerInsertedHTML } from 'next/navigation';
+import React from 'react';
 
 export function AntDesignRegistry({ children }: { children: React.ReactNode }) {
   const cache = React.useMemo<Entity>(() => createCache(), []);

@@ -12,6 +12,7 @@ import {
   Spin,
   message,
 } from 'antd';
+import _ from 'lodash';
 import { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import {
   currentSoldier,
@@ -20,7 +21,6 @@ import {
   resetPasswordForce,
   updatePermissions,
 } from '../actions';
-import _ from 'lodash';
 import {
   HelpModal,
   PasswordForm,

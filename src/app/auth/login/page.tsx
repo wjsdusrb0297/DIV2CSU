@@ -1,12 +1,12 @@
 'use client';
 
+import { signIn } from '@/app/actions';
+import { LockOutlined, UserOutlined } from '@ant-design/icons';
+import { Button, Form, Input } from 'antd';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useCallback, useState } from 'react';
-import { Button, Form, Input } from 'antd';
 import { withMask } from 'use-mask-input';
-import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { signIn } from '@/app/actions';
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);

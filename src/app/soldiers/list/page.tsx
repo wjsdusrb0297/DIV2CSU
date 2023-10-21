@@ -1,10 +1,10 @@
 'use client';
 
-import { UserCard } from './components';
-import { Card, Input, Pagination, Skeleton } from 'antd';
-import { ChangeEventHandler, useCallback, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { listSoldiers } from '@/app/actions';
+import { Card, Input, Pagination, Skeleton } from 'antd';
+import { useRouter } from 'next/navigation';
+import { ChangeEventHandler, useCallback, useEffect, useState } from 'react';
+import { UserCard } from './components';
 
 export default function ManageSoldiersPage({
   searchParams,

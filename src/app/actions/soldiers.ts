@@ -1,12 +1,12 @@
 'use server';
 
-import jwt from 'jsonwebtoken';
-import { cookies } from 'next/headers';
-import { kysely } from './kysely';
-import { jsonArrayFrom } from 'kysely/helpers/mysql';
-import { cache } from 'react';
 import { Permission } from '@/interfaces';
+import jwt from 'jsonwebtoken';
+import { jsonArrayFrom } from 'kysely/helpers/mysql';
+import { cookies } from 'next/headers';
+import { cache } from 'react';
 import { validateSoldier } from './auth';
+import { kysely } from './kysely';
 import { hasPermission } from './utils';
 
 export async function unauthenticated_currentSoldier() {

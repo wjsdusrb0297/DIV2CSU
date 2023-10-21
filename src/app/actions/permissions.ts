@@ -1,7 +1,7 @@
 'use server';
 
-import { currentSoldier, fetchSoldier } from './soldiers';
 import { kysely } from './kysely';
+import { currentSoldier, fetchSoldier } from './soldiers';
 import { hasPermission, sortPermission, validatePermission } from './utils';
 
 export async function updatePermissions({

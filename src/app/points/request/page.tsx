@@ -1,5 +1,6 @@
 'use client';
 
+import { createPoint, searchPointsGiver } from '@/app/actions';
 import {
   AutoComplete,
   Button,
@@ -11,9 +12,8 @@ import {
   message,
 } from 'antd';
 import locale from 'antd/es/date-picker/locale/ko_KR';
-import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createPoint, searchPointsGiver } from '@/app/actions';
+import { useCallback, useEffect, useState } from 'react';
 import { PointTemplatesInput } from '../components';
 
 export default function RequestPointFormPage() {

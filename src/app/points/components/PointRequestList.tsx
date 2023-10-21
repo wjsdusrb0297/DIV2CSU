@@ -1,6 +1,6 @@
+import { fetchPendingPoints } from '@/app/actions';
 import { Empty } from 'antd';
 import { PointRequestCard } from '.';
-import { fetchPendingPoints } from '@/app/actions';
 
 export async function PointRequestList() {
   const data = await fetchPendingPoints();

@@ -1,12 +1,12 @@
 'use client';
 
+import { signUp } from '@/app/actions';
 import { LeftOutlined, LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Divider, Form, Input, Radio, message } from 'antd';
 import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
 import { withMask } from 'use-mask-input';
 import { SignUpForm } from './interfaces';
-import { signUp } from '@/app/actions';
 
 export default function SignUpPage() {
   const router = useRouter();

@@ -1,5 +1,6 @@
 'use client';
 
+import { createPoint, searchPointsReceiver } from '@/app/actions';
 import {
   AutoComplete,
   Button,
@@ -11,11 +12,10 @@ import {
   message,
 } from 'antd';
 import locale from 'antd/es/date-picker/locale/ko_KR';
-import { useCallback, useEffect, useState } from 'react';
-import { checkIfNco } from './actions';
 import { useRouter } from 'next/navigation';
-import { createPoint, searchPointsReceiver } from '@/app/actions';
+import { useCallback, useEffect, useState } from 'react';
 import { PointTemplatesInput } from '../components';
+import { checkIfNco } from './actions';
 
 export default function GivePointFormPage() {
   const [merit, setMerit] = useState(1);

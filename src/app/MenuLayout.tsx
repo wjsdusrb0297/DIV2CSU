@@ -1,23 +1,23 @@
 'use client';
 
 import {
-  MenuUnfoldOutlined,
-  MenuFoldOutlined,
-  LikeOutlined,
   ContainerOutlined,
-  SendOutlined,
-  MailOutlined,
   HomeOutlined,
+  LikeOutlined,
+  MailOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  SendOutlined,
   UnlockOutlined,
-  UserOutlined,
   UserAddOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 import { App, Button, Layout, Menu, MenuProps } from 'antd';
-import { useRouter, usePathname } from 'next/navigation';
-import { MenuClickEventHandler } from 'rc-menu/lib/interface';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { currentSoldier } from './actions';
 import _ from 'lodash';
+import { usePathname, useRouter } from 'next/navigation';
+import { MenuClickEventHandler } from 'rc-menu/lib/interface';
+import { useCallback, useMemo, useState } from 'react';
+import { currentSoldier } from './actions';
 
 const title = {
   '/points': '상점 관리',

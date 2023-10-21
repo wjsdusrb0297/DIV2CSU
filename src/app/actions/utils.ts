@@ -1,6 +1,5 @@
 import { Permission } from '@/interfaces';
 import _ from 'lodash';
-import { isFunctionExpression } from 'typescript';
 import z from 'zod';
 
 export function hasPermission(

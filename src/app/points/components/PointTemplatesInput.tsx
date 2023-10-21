@@ -1,7 +1,7 @@
 'use client';
 
 import { fetchPointTemplates } from '@/app/actions';
-import { AutoComplete, Button, Cascader, Input } from 'antd';
+import { AutoComplete, Button, Input } from 'antd';
 import { DefaultOptionType } from 'antd/es/select';
 import { useEffect, useState } from 'react';
 

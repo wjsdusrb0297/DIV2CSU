@@ -1,13 +1,13 @@
-import { Divider, FloatButton } from 'antd';
-import {
-  PointsHistoryList,
-  TotalPointBox,
-  PointListPagination,
-  PointRequestList,
-} from './components';
 import { Soldier } from '@/interfaces';
 import { PlusOutlined } from '@ant-design/icons';
+import { Divider, FloatButton } from 'antd';
 import { currentSoldier, fetchSoldier, listPoints } from '../actions';
+import {
+  PointListPagination,
+  PointRequestList,
+  PointsHistoryList,
+  TotalPointBox,
+} from './components';
 
 async function EnlistedPage({ user, page }: { user: Soldier; page: number }) {
   const { data, count } = await listPoints(user?.sn, page);

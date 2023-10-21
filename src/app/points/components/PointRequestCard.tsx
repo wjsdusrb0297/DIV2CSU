@@ -1,5 +1,11 @@
 'use client';
 
+import { fetchPoint, verifyPoint } from '@/app/actions';
+import {
+  ArrowRightOutlined,
+  CheckOutlined,
+  CloseOutlined,
+} from '@ant-design/icons';
 import {
   Button,
   Card,
@@ -9,19 +15,13 @@ import {
   Skeleton,
   message,
 } from 'antd';
+import moment from 'moment';
 import {
   ChangeEventHandler,
   useCallback,
   useLayoutEffect,
   useState,
 } from 'react';
-import moment from 'moment';
-import {
-  ArrowRightOutlined,
-  CheckOutlined,
-  CloseOutlined,
-} from '@ant-design/icons';
-import { fetchPoint, verifyPoint } from '@/app/actions';
 
 export type PointRequestCardProps = {
   pointId: string;

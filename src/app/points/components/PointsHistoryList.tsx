@@ -1,5 +1,5 @@
-import { PointCard } from './PointCard';
 import { Empty } from 'antd';
+import { PointCard } from './PointCard';
 
 export type PointsHistoryListProps = { type: string; data: { id: string }[] };
 

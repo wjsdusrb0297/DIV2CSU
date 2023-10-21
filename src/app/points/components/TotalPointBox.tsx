@@ -1,9 +1,9 @@
 'use client';
-import { useLayoutEffect, useState } from 'react';
-import { Card, Row, Skeleton, Statistic } from 'antd';
-import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
-import { Soldier } from '@/interfaces';
 import { fetchPointSummary } from '@/app/actions';
+import { Soldier } from '@/interfaces';
+import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
+import { Card, Row, Skeleton, Statistic } from 'antd';
+import { useLayoutEffect, useState } from 'react';
 
 export function TotalPointBox({ user }: { user: Soldier }) {
   const [data, setData] = useState<Awaited<
