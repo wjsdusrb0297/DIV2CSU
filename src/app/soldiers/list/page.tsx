@@ -3,7 +3,6 @@
 import { UserCard } from './components';
 import { Card, Input, Pagination, Skeleton } from 'antd';
 import { ChangeEventHandler, useCallback, useEffect, useState } from 'react';
-import { fetchAllSoldiers } from './actions';
 import { useRouter } from 'next/navigation';
 import { listSoldiers } from '@/app/actions';
 
@@ -14,7 +13,7 @@ export default function ManageSoldiersPage({
 }) {
   const router = useRouter();
   const [data, setData] = useState<
-    Awaited<ReturnType<typeof fetchAllSoldiers>>[0] | null
+    Awaited<ReturnType<typeof listSoldiers>>['data'] | null
   >(null);
 
   const [query, setQuery] = useState('');
