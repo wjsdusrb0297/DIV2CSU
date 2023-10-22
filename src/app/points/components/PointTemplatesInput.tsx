@@ -46,6 +46,7 @@ export function PointTemplatesInput({ onChange }: PointTemplatesInputProps) {
                   )}
                   {row.demerit && (
                     <Button
+                      className='ml-2'
                       onClick={() => {
                         onChange?.(row.reason, row.demerit);
                       }}
