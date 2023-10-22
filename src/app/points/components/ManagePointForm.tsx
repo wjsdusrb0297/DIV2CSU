@@ -132,7 +132,6 @@ export function ManagePointForm({ type }: ManagePointFormProps) {
           name={type === 'request' ? 'giverId' : 'receiverId'}
           rules={[
             { required: true, message: '수령자를 입력해주세요' },
-            { min: 1, message: '상벌점은 최소 1점입니다' },
             { pattern: /^[0-9]{2}-[0-9]{5,8}$/, message: '잘못된 군번입니다' },
           ]}
         >
@@ -147,7 +146,10 @@ export function ManagePointForm({ type }: ManagePointFormProps) {
         </Form.Item>
         <Form.Item<number>
           name='value'
-          rules={[{ required: true, message: '상벌점을 입력해주세요' }]}
+          rules={[
+            { required: true, message: '상벌점을 입력해주세요' },
+            { min: 1, message: '상벌점은 최소 1점입니다' },
+          ]}
         >
           <InputNumber
             min={1}
