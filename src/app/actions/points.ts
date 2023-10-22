@@ -26,7 +26,7 @@ export async function listPoints(sn: string, page: number = 0) {
     .selectFrom('points')
     .where(type === 'enlisted' ? 'receiver_id' : 'giver_id', '=', sn);
 
-  const [data, { count }] = await Promise.all([
+  const [data, { count }, usedPoints] = await Promise.all([
     query
       .orderBy('created_at desc')
       .select(['id'])
@@ -36,8 +36,16 @@ export async function listPoints(sn: string, page: number = 0) {
     query
       .select((eb) => eb.fn.count<string>('id').as('count'))
       .executeTakeFirstOrThrow(),
+    type === 'enlisted' &&
+      kysely
+        .selectFrom('used_points')
+        .where('user_id', '=', sn)
+        .leftJoin('soldiers', 'soldiers.sn', 'used_points.recorded_by')
+        .select('soldiers.name as recorded_by')
+        .selectAll()
+        .execute(),
   ]);
-  return { data, count: parseInt(count, 10) };
+  return { data, count: parseInt(count, 10), usedPoints: usedPoints || null };
 }
 
 export async function fetchPendingPoints() {
@@ -262,45 +270,40 @@ export async function redeemPoint({
     return { message: '권한이 없습니다' };
   }
   try {
-    await kysely.transaction().execute(async (trx) => {
-      const [{ total }, { used_points }] = await Promise.all([
-        trx
-          .selectFrom('points')
-          .where('receiver_id', '=', userId)
-          .select(({ fn }) =>
-            fn
-              .coalesce(fn.sum<string>('points.value'), sql<string>`0`)
-              .as('total'),
-          )
-          .executeTakeFirstOrThrow(),
-        trx
-          .selectFrom('used_points')
-          .where('user_id', '=', userId)
-          .select(({ fn }) =>
-            fn
-              .coalesce(fn.sum<string>('used_points.value'), sql<string>`0`)
-              .as('used_points'),
-          )
-          .executeTakeFirstOrThrow(),
-      ]);
-      if (parseInt(total, 10) - parseInt(used_points, 10) < value) {
-        throw new Error('상점이 부족합니다');
-      }
-      await trx
-        .insertInto('used_points')
-        .values({
-          user_id: userId,
-          recorded_by: sn,
-          reason,
-          value,
-        })
-        .executeTakeFirstOrThrow();
-    });
+    const [{ total }, { used_points }] = await Promise.all([
+      kysely
+        .selectFrom('points')
+        .where('receiver_id', '=', userId)
+        .select(({ fn }) =>
+          fn
+            .coalesce(fn.sum<string>('points.value'), sql<string>`0`)
+            .as('total'),
+        )
+        .executeTakeFirstOrThrow(),
+      kysely
+        .selectFrom('used_points')
+        .where('user_id', '=', userId)
+        .select(({ fn }) =>
+          fn
+            .coalesce(fn.sum<string>('used_points.value'), sql<string>`0`)
+            .as('used_points'),
+        )
+        .executeTakeFirstOrThrow(),
+    ]);
+    if (parseInt(total, 10) - parseInt(used_points, 10) < value) {
+      return { message: '상점이 부족합니다' };
+    }
+    await kysely
+      .insertInto('used_points')
+      .values({
+        user_id: userId,
+        recorded_by: sn,
+        reason,
+        value,
+      })
+      .executeTakeFirstOrThrow();
     return { message: null };
   } catch (e) {
-    if (e instanceof Error) {
-      return { message: e.message };
-    }
     return { message: '알 수 없는 오류가 발생했습니다' };
   }
 }
