@@ -31,15 +31,16 @@ export function PointTemplatesInput({ onChange }: PointTemplatesInputProps) {
                   onClick={() => {
                     onChange?.(row.reason);
                   }}
-                  className='flex flex-row items-center'
+                  className='flex flex-1 flex-row items-center w-full'
                   key={row.id}
                 >
-                  <span className='flex-1'>{row.reason}</span>
+                  <span className='flex-1 inline-block whitespace-normal'>{row.reason}</span>
                   {row.merit && (
                     <Button
                       onClick={() => {
                         onChange?.(row.reason, row.merit);
                       }}
+                      type='primary'
                     >
                       {row.merit}
                     </Button>
@@ -50,6 +51,8 @@ export function PointTemplatesInput({ onChange }: PointTemplatesInputProps) {
                       onClick={() => {
                         onChange?.(row.reason, row.demerit);
                       }}
+                      type='primary'
+                      danger
                     >
                       {row.demerit}
                     </Button>
@@ -66,7 +69,7 @@ export function PointTemplatesInput({ onChange }: PointTemplatesInputProps) {
   return (
     <AutoComplete
       size='large'
-      popupMatchSelectWidth={500}
+      popupMatchSelectWidth
       options={options}
     >
       <Input.Search
