@@ -7,14 +7,17 @@ import {
   PointRequestList,
   PointsHistoryList,
   TotalPointBox,
+  UsedPointsHorizontalList,
 } from './components';
 
+
 async function EnlistedPage({ user, page }: { user: Soldier; page: number }) {
-  const { data, count } = await listPoints(user?.sn, page);
+  const { data, count, usedPoints } = await listPoints(user?.sn, page);
   return (
     <div className='flex flex-1 flex-col'>
       <TotalPointBox user={user} />
       <div className='flex-1 mb-2'>
+        <UsedPointsHorizontalList data={usedPoints} />
         <PointsHistoryList
           type={user.type}
           data={data}
