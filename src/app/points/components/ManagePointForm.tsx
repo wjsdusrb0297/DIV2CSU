@@ -146,10 +146,7 @@ export function ManagePointForm({ type }: ManagePointFormProps) {
         </Form.Item>
         <Form.Item<number>
           name='value'
-          rules={[
-            { required: true, message: '상벌점을 입력해주세요' },
-            { min: 1, message: '상벌점은 최소 1점입니다' },
-          ]}
+          rules={[{ required: true, message: '상벌점을 입력해주세요' }]}
         >
           <InputNumber
             min={1}
