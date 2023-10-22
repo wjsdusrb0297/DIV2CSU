@@ -12,6 +12,7 @@ import z from 'zod';
 import { kysely } from './kysely';
 import { currentSoldier } from './soldiers';
 import { hasPermission } from './utils';
+import { revalidatePath } from 'next/cache';
 
 const AuthParams = Soldier.pick({ sn: true, password: true });
 
@@ -270,4 +271,9 @@ export async function resetPasswordForce(sn: string) {
   } catch (e) {
     return { password: null, message: '비밀번호 초기화에 실패했습니다' };
   }
+}
+
+export async function signOut() {
+  cookies().delete('auth.access_token');
+  revalidatePath('/', 'layout');
 }

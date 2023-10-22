@@ -19,7 +19,7 @@ import _ from 'lodash';
 import { usePathname, useRouter } from 'next/navigation';
 import { MenuClickEventHandler } from 'rc-menu/lib/interface';
 import { useCallback, useMemo, useState } from 'react';
-import { currentSoldier } from './actions';
+import { currentSoldier, signOut } from './actions';
 
 const title = {
   '/points': '상점 관리',
@@ -55,6 +55,12 @@ export function MenuLayout({
     },
     [router],
   );
+
+  const onSignOut = useCallback(async () => {
+    await signOut();
+    router.replace('/auth/logout');
+    setCollapsed(true);
+  }, [router]);
 
   const items: MenuProps['items'] = useMemo(
     () =>
@@ -152,10 +158,10 @@ export function MenuLayout({
               label: '로그아웃',
               icon: <UnlockOutlined />,
               danger: true,
-              onClick,
+              onClick: onSignOut,
             },
           ],
-    [data, onClick],
+    [data, onClick, onSignOut],
   );
 
   const onClickMenu = useCallback(() => setCollapsed((state) => !state), []);
