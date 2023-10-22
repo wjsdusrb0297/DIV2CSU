@@ -57,12 +57,12 @@ export function ManagePointForm({ type }: ManagePointFormProps) {
   useEffect(() => {
     setSearching(true);
     if (type === 'request') {
-      searchPointsGiver(query).then((value) => {
+      searchPointsGiver(query || '').then((value) => {
         setSearching(false);
         setOptions(value as any);
       });
     } else {
-      searchPointsReceiver(query).then((value) => {
+      searchPointsReceiver(query || '').then((value) => {
         setSearching(false);
         setOptions(value as any);
       });
