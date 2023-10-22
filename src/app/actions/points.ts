@@ -264,7 +264,7 @@ export async function redeemPoint({
   try {
     await kysely.transaction().execute(async (trx) => {
       const [{ total }, { used_points }] = await Promise.all([
-        kysely
+        trx
           .selectFrom('points')
           .where('receiver_id', '=', userId)
           .select(({ fn }) =>
@@ -273,7 +273,7 @@ export async function redeemPoint({
               .as('total'),
           )
           .executeTakeFirstOrThrow(),
-        kysely
+        trx
           .selectFrom('used_points')
           .where('user_id', '=', userId)
           .select(({ fn }) =>
@@ -286,7 +286,7 @@ export async function redeemPoint({
       if (parseInt(total, 10) - parseInt(used_points, 10) < value) {
         throw new Error('상점이 부족합니다');
       }
-      await kysely
+      await trx
         .insertInto('used_points')
         .values({
           user_id: userId,
