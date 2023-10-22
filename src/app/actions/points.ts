@@ -2,9 +2,9 @@
 
 import { kysely } from './kysely';
 import { currentSoldier, fetchSoldier } from './soldiers';
-import { checkIfSoldierHasPermission } from './utils';
+import { checkIfSoldierHasPermission, hasPermission } from './utils';
 
-export async function fetchPoint(pointId: string) {
+export async function fetchPoint(pointId: number) {
   return kysely
     .selectFrom('points')
     .where('id', '=', pointId)
@@ -49,7 +49,7 @@ export async function fetchPendingPoints() {
     .execute();
 }
 
-export async function deletePoint(pointId: string) {
+export async function deletePoint(pointId: number) {
   const { type, sn } = await currentSoldier();
   if (type === 'nco') {
     return { message: '간부는 상벌점을 지울 수 없습니다' };
@@ -76,7 +76,7 @@ export async function deletePoint(pointId: string) {
 }
 
 export async function verifyPoint(
-  pointId: string,
+  pointId: number,
   value: boolean,
   rejectReason?: string,
 ) {
@@ -217,6 +217,57 @@ export async function createPoint({
         given_at: givenAt,
         value,
         verified_at: new Date(),
+      })
+      .executeTakeFirstOrThrow();
+    return { message: null };
+  } catch (e) {
+    return { message: '알 수 없는 오류가 발생했습니다' };
+  }
+}
+
+export async function redeemPoint({
+  value,
+  userId,
+  reason,
+}: {
+  value: number;
+  userId: string;
+  reason: string;
+}) {
+  if (reason.trim() === '') {
+    return { message: '상벌점 사용 이유를 작성해주세요' };
+  }
+  if (value !== Math.round(value)) {
+    return { message: '상벌점은 정수여야 합니다' };
+  }
+  if (value <= 0) {
+    return { message: '1점 이상이어야합니다' };
+  }
+  const { type, sn, permissions } = await currentSoldier();
+  if (sn == null) {
+    return { message: '로그아웃후 재시도해 주세요' };
+  }
+  if (type === 'enlisted') {
+    return { message: '용사는 상점을 사용할 수 없습니다' };
+  }
+  if (userId == null) {
+    return { message: '대상을 입력해주세요' };
+  }
+  const target = await fetchSoldier(userId);
+  if (target == null) {
+    return { message: '대상이 존재하지 않습니다' };
+  }
+  if (!hasPermission(permissions, ['Admin', 'PointAdmin', 'UsePoint'])) {
+    return { message: '권한이 없습니다' };
+  }
+  try {
+    await kysely
+      .insertInto('used_points')
+      .values({
+        user_id: userId,
+        recorded_by: sn,
+        reason,
+        value,
       })
       .executeTakeFirstOrThrow();
     return { message: null };
