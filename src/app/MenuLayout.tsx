@@ -2,6 +2,7 @@
 
 import {
   ContainerOutlined,
+  DeleteOutlined,
   HomeOutlined,
   LikeOutlined,
   MailOutlined,
@@ -12,7 +13,8 @@ import {
   UserAddOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import { App, Button, Layout, Menu, MenuProps } from 'antd';
+import { App, Button, ConfigProvider, Layout, Menu, MenuProps } from 'antd';
+import locale from 'antd/locale/ko_KR';
 import _ from 'lodash';
 import { usePathname, useRouter } from 'next/navigation';
 import { MenuClickEventHandler } from 'rc-menu/lib/interface';
@@ -23,6 +25,7 @@ const title = {
   '/points': '상점 관리',
   '/points/request': '상점 요청',
   '/points/give': '상점 부여',
+  '/points/redeem': '상점 사용',
   '/soldiers/list': '유저 관리',
   '/soldiers/signup': '회원가입 관리',
 };
@@ -130,6 +133,18 @@ export function MenuLayout({
                       'GiveLargeDemeritPoint',
                     ]).length === 0,
                 },
+                {
+                  key: '/points/redeem',
+                  label: '상점 사용',
+                  icon: <DeleteOutlined />,
+                  onClick,
+                  disabled:
+                    _.intersection(data.permissions, [
+                      'Admin',
+                      'PointAdmin',
+                      'UsePoint',
+                    ]).length === 0,
+                },
               ],
             },
             {
@@ -154,59 +169,61 @@ export function MenuLayout({
   }
 
   return (
-    <App>
-      <Layout style={{ minHeight: '100vh' }}>
-        <Layout.Sider
-          style={{
-            overflow: 'auto',
-            height: '100vh',
-            position: 'fixed',
-            left: 0,
-            top: 60,
-            bottom: 0,
-            zIndex: 1,
-          }}
-          collapsible
-          collapsed={collapsed}
-          collapsedWidth={0}
-          trigger={null}
-        >
-          <Menu
-            theme='dark'
-            mode='inline'
-            items={items}
-            selectedKeys={[pathname]}
-          />
-        </Layout.Sider>
-        <Layout>
-          <Layout.Header
+    <ConfigProvider locale={locale}>
+      <App>
+        <Layout style={{ minHeight: '100vh' }}>
+          <Layout.Sider
             style={{
-              position: 'sticky',
-              top: 0,
+              overflow: 'auto',
+              height: '100vh',
+              position: 'fixed',
+              left: 0,
+              top: 60,
+              bottom: 0,
               zIndex: 1,
-              display: 'flex',
-              flexDirection: 'row',
-              padding: 0,
-              paddingLeft: 20,
-              alignItems: 'center',
             }}
+            collapsible
+            collapsed={collapsed}
+            collapsedWidth={0}
+            trigger={null}
           >
-            <Button
-              type='text'
-              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-              onClick={onClickMenu}
-              style={{ color: '#FFF' }}
+            <Menu
+              theme='dark'
+              mode='inline'
+              items={items}
+              selectedKeys={[pathname]}
             />
-            <p className='text-white font-bold text-xl ml-5'>
-              {renderTitle(pathname)}
-            </p>
-          </Layout.Header>
-          <Layout.Content>{children}</Layout.Content>
-          <Layout.Footer style={{ textAlign: 'center' }}>
-            <span className='text-black font-bold'>©2023 키보드워리어</span>
-          </Layout.Footer>
+          </Layout.Sider>
+          <Layout>
+            <Layout.Header
+              style={{
+                position: 'sticky',
+                top: 0,
+                zIndex: 1,
+                display: 'flex',
+                flexDirection: 'row',
+                padding: 0,
+                paddingLeft: 20,
+                alignItems: 'center',
+              }}
+            >
+              <Button
+                type='text'
+                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                onClick={onClickMenu}
+                style={{ color: '#FFF' }}
+              />
+              <p className='text-white font-bold text-xl ml-5'>
+                {renderTitle(pathname)}
+              </p>
+            </Layout.Header>
+            <Layout.Content>{children}</Layout.Content>
+            <Layout.Footer style={{ textAlign: 'center' }}>
+              <span className='text-black font-bold'>©2023 키보드워리어</span>
+            </Layout.Footer>
+          </Layout>
         </Layout>
-      </Layout>
-    </App>
+      </App>
+    </ConfigProvider>
   );
 }

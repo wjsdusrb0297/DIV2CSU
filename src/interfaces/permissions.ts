@@ -13,6 +13,7 @@ export const Permission = z.enum([
   'GiveLargeMeritPoint',
   'GiveDemeritPoint',
   'GiveLargeDemeritPoint',
+  'UsePoint',
 ]);
 
 export type Permission = z.infer<typeof Permission>;
