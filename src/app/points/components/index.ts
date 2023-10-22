@@ -1,3 +1,4 @@
+export * from './ManagePointForm';
 export * from './PointCard';
 export * from './PointListPagination';
 export * from './PointRequestCard';
