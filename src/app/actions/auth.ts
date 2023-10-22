@@ -71,7 +71,6 @@ export async function signIn({
       ])
       .executeTakeFirstOrThrow();
   } catch (e) {
-    console.log({ e });
     if (e instanceof NoResultError) {
       return {
         message: '존재하지 않는 사용자입니다',
