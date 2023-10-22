@@ -1,7 +1,7 @@
 import { Empty } from 'antd';
 import { PointCard } from './PointCard';
 
-export type PointsHistoryListProps = { type: string; data: { id: string }[] };
+export type PointsHistoryListProps = { type: string; data: { id: number }[] };
 
 export async function PointsHistoryList({
   data,

@@ -7,7 +7,7 @@ import moment from 'moment';
 import { useCallback, useLayoutEffect, useState } from 'react';
 
 export type PointCardProps = {
-  pointId: string;
+  pointId: number;
 };
 
 export function PointCard({ pointId }: PointCardProps) {

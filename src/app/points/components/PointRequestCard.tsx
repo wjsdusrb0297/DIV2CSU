@@ -24,7 +24,7 @@ import {
 } from 'react';
 
 export type PointRequestCardProps = {
-  pointId: string;
+  pointId: number;
 };
 
 export function PointRequestCard({ pointId }: PointRequestCardProps) {
