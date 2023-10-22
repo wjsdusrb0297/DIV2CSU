@@ -127,7 +127,7 @@ export default function UsePointFormPage() {
           <Input.TextArea
             showCount
             maxLength={500}
-            placeholder='상벌점 지급 이유'
+            placeholder='상벌점 사용 이유'
             style={{ height: 150 }}
           />
         </Form.Item>
