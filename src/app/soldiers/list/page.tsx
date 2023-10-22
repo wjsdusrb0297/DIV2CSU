@@ -1,10 +1,10 @@
 'use client';
 
-import { UserCard } from './components';
+import { listSoldiers } from '@/app/actions';
 import { Card, Input, Pagination, Skeleton } from 'antd';
-import { ChangeEventHandler, useCallback, useEffect, useState } from 'react';
-import { fetchAllSoldiers } from './actions';
 import { useRouter } from 'next/navigation';
+import { ChangeEventHandler, useCallback, useEffect, useState } from 'react';
+import { UserCard } from './components';
 
 export default function ManageSoldiersPage({
   searchParams,
@@ -13,7 +13,7 @@ export default function ManageSoldiersPage({
 }) {
   const router = useRouter();
   const [data, setData] = useState<
-    Awaited<ReturnType<typeof fetchAllSoldiers>>[0] | null
+    Awaited<ReturnType<typeof listSoldiers>>['data'] | null
   >(null);
 
   const [query, setQuery] = useState('');
@@ -34,10 +34,10 @@ export default function ManageSoldiersPage({
   );
 
   useEffect(() => {
-    fetchAllSoldiers(query, parseInt(searchParams.page || '1', 10)).then(
-      (d) => {
-        setData(d[0]);
-        setCount(parseInt(d[1].count, 10));
+    listSoldiers({ query, page: parseInt(searchParams.page || '1', 10) }).then(
+      ({ count, data }) => {
+        setData(data);
+        setCount(count);
       },
     );
   }, [query, searchParams.page]);

@@ -1,16 +1,12 @@
-import { Soldier } from '@/interfaces';
-import { api } from '@/lib/instance';
-import { UnverifiedUserCard } from './components';
+import { listUnverifiedSoldiers } from '@/app/actions';
+import { UnverifiedUserCardList } from './components';
 
 export default async function ManageSignUpPage() {
-  const data = await api
-    .query({ unverifiedOnly: true })
-    .get('/soldiers/search')
-    .json<Pick<Soldier, 'name' | 'sn' | 'type'>[]>();
-  return data.map((d) => (
-    <UnverifiedUserCard
-      key={d.sn}
-      {...d}
+  const { message, data } = await listUnverifiedSoldiers();
+  return (
+    <UnverifiedUserCardList
+      data={data}
+      message={message}
     />
-  ));
+  );
 }

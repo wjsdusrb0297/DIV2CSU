@@ -5,6 +5,14 @@ const nextConfig = {
       { protocol: 'https', hostname: 'upload.wikimedia.org', pathname: '**' },
     ],
   },
+  transpilePackages: [
+    'antd',
+    'rc-picker',
+    'rc-util',
+    '@ant-design/icons',
+    'rc-pagination',
+    'rc-notification',
+  ],
   experimental: { serverActions: true },
 };
 

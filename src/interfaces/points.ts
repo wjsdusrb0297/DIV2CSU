@@ -1,13 +1,16 @@
-export type Point = {
-  id: string;
-  giver_id: string;
-  receiver_id: string;
-  created_at: string;
-  verified_at: string | null;
-  rejected_at: string | null;
-  rejected_reason: string | null;
-  value: number;
-  reason: string;
-  used_id: string | null;
-  given_at: string;
-};
+import z from 'zod';
+
+export const Point = z.object({
+  id: z.string().uuid(),
+  giver_id: z.string(),
+  receiver_id: z.string(),
+  created_at: z.date(),
+  verified_at: z.date().nullable(),
+  value: z.number(),
+  reason: z.string(),
+  given_at: z.date(),
+  rejected_at: z.date().nullable(),
+  rejected_reason: z.string(),
+});
+
+export type Point = z.infer<typeof Point>;

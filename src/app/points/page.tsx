@@ -1,27 +1,31 @@
-import { Divider, FloatButton } from 'antd';
-import {
-  PointsHistoryList,
-  TotalPointBox,
-  PointListPagination,
-  PointRequestList,
-} from './components';
-import { api } from '@/lib/instance';
 import { Soldier } from '@/interfaces';
 import { PlusOutlined } from '@ant-design/icons';
-import { fetchUserFromJwt } from '../actions';
+import { Divider, FloatButton } from 'antd';
+import { currentSoldier, fetchSoldier, listPoints } from '../actions';
+import {
+  PointListPagination,
+  PointRequestList,
+  PointsHistoryList,
+  TotalPointBox,
+  UsedPointsHorizontalList,
+} from './components';
+
 
 async function EnlistedPage({ user, page }: { user: Soldier; page: number }) {
+  const { data, count, usedPoints } = await listPoints(user?.sn, page);
   return (
     <div className='flex flex-1 flex-col'>
       <TotalPointBox user={user} />
       <div className='flex-1 mb-2'>
+        <UsedPointsHorizontalList data={usedPoints} />
         <PointsHistoryList
-          user={user}
-          page={page}
+          type={user.type}
+          data={data}
         />
       </div>
       <PointListPagination
         sn={user.sn}
+        total={count}
         page={page}
       />
       <FloatButton
@@ -41,6 +45,8 @@ async function NcoPage({
   page: number;
   showRequest: boolean;
 }) {
+  const { data, count } = await listPoints(user?.sn, page);
+
   return (
     <div className='flex flex-1 flex-col'>
       <div className='flex-1 mb-2'>
@@ -51,13 +57,14 @@ async function NcoPage({
           </>
         )}
         <PointsHistoryList
-          user={user}
-          page={page}
+          type={user.type}
+          data={data}
         />
       </div>
       <Divider />
       <PointListPagination
         sn={user.sn}
+        total={count}
         page={page}
       />
       <FloatButton
@@ -74,24 +81,24 @@ export default async function ManagePointsPage({
   searchParams: { sn?: string; page?: string };
 }) {
   const [user, profile] = await Promise.all([
-    api.query({ sn: searchParams.sn }).get('/soldiers').json<Soldier>(),
-    fetchUserFromJwt(),
+    searchParams.sn ? fetchSoldier(searchParams.sn) : currentSoldier(),
+    currentSoldier(),
   ]);
   const page = parseInt(searchParams?.page ?? '1', 10) || 1;
 
   if (user.type === 'enlisted') {
     return (
       <EnlistedPage
-        user={user}
+        user={user as any}
         page={page}
       />
     );
   }
   return (
     <NcoPage
-      user={user}
+      user={user as any}
       page={page}
-      showRequest={profile?.sub === user.sn}
+      showRequest={profile.sn === user.sn}
     />
   );
 }

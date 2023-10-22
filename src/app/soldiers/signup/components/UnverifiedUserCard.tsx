@@ -1,9 +1,9 @@
 'use client';
 
+import { verifySoldier } from '@/app/actions';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
-import { Button, Card, Popconfirm, message } from 'antd';
+import { App, Button, Card, Popconfirm } from 'antd';
 import { useCallback, useState } from 'react';
-import { verifyUser } from '../actions';
 
 export type UnverifiedUserCardProps = {
   name: string;
@@ -23,26 +23,24 @@ export function UnverifiedUserCard({
     accepted: '#A7C0FF',
     rejected: '#ED2939',
   }[state];
+  const { message } = App.useApp();
 
   const handleClick = useCallback(
-    (value: boolean) => () => {
+    (value: boolean) => async () => {
       setLoading(true);
-      verifyUser(sn, value)
-        .then(() => {
-          setState(value ? 'accepted' : 'rejected');
-          message.success(value ? '승인되었습니다' : '반려되었습니다');
-        })
-        .catch((e: Error) => {
-          if (e?.message) {
-            const data = JSON.parse(e?.message);
-            message.error(data.message);
-          }
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+      const { success, message: resultMessage } = await verifySoldier(
+        sn,
+        value,
+      );
+      if (success) {
+        setState(value ? 'accepted' : 'rejected');
+        message.success(resultMessage);
+      } else {
+        message.error(resultMessage);
+      }
+      setLoading(false);
     },
-    [sn],
+    [sn, message],
   );
 
   return (

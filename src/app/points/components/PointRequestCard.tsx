@@ -1,5 +1,11 @@
 'use client';
 
+import { fetchPoint, verifyPoint } from '@/app/actions';
+import {
+  ArrowRightOutlined,
+  CheckOutlined,
+  CloseOutlined,
+} from '@ant-design/icons';
 import {
   Button,
   Card,
@@ -9,34 +15,29 @@ import {
   Skeleton,
   message,
 } from 'antd';
+import moment from 'moment';
 import {
   ChangeEventHandler,
   useCallback,
   useLayoutEffect,
   useState,
 } from 'react';
-import { fetchPoint, verifyPoint } from '../actions';
-import { FetchPointData } from '../interfaces';
-import moment from 'moment';
-import {
-  ArrowRightOutlined,
-  CheckOutlined,
-  CloseOutlined,
-} from '@ant-design/icons';
 
 export type PointRequestCardProps = {
-  pointId: string;
+  pointId: number;
 };
 
 export function PointRequestCard({ pointId }: PointRequestCardProps) {
-  const [point, setPoint] = useState<FetchPointData | null>(null);
+  const [point, setPoint] = useState<
+    Awaited<ReturnType<typeof fetchPoint>> | undefined
+  >(undefined);
   const [loading, setLoading] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
   const [rejectError, setRejectError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
   const [modalShown, setModalShown] = useState(false);
 
-  const onHandle = useCallback(
+  const handleConfirm = useCallback(
     (value: boolean) => () => {
       if (success != null) {
         return;
@@ -44,15 +45,12 @@ export function PointRequestCard({ pointId }: PointRequestCardProps) {
       if (value) {
         setLoading(true);
         return verifyPoint(pointId, value)
-          .then(() => {
+          .then(({ message: newMessage }) => {
+            if (newMessage) {
+              return message.error(newMessage);
+            }
             setSuccess(true);
             message.success('부여했습니다');
-          })
-          .catch((e) => {
-            if (e?.message) {
-              const data = JSON.parse(e?.message);
-              message.error(data.message);
-            }
           })
           .finally(() => {
             setLoading(false);
@@ -70,17 +68,14 @@ export function PointRequestCard({ pointId }: PointRequestCardProps) {
     }
     setLoading(true);
     verifyPoint(pointId, false, rejectReason)
-      .then(() => {
+      .then(({ message: newMessage }) => {
+        if (newMessage) {
+          return message.error(newMessage);
+        }
         setModalShown(false);
         setSuccess(true);
         message.success('반려했습니다');
         setRejectError(null);
-      })
-      .catch((e) => {
-        if (e?.message) {
-          const data = JSON.parse(e?.message);
-          setRejectError(data.message);
-        }
       })
       .finally(() => {
         setLoading(false);
@@ -129,7 +124,7 @@ export function PointRequestCard({ pointId }: PointRequestCardProps) {
               title='부여하겠습니까?'
               okText='부여'
               cancelText='취소'
-              onConfirm={onHandle(true)}
+              onConfirm={handleConfirm(true)}
             >
               <Button
                 type='primary'
@@ -143,7 +138,7 @@ export function PointRequestCard({ pointId }: PointRequestCardProps) {
               title='반려하겠습니까?'
               okText='반려'
               cancelText='취소'
-              onConfirm={onHandle(false)}
+              onConfirm={handleConfirm(false)}
             >
               <Button
                 danger

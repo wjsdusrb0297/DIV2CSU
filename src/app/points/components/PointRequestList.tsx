@@ -1,9 +1,9 @@
-import { api } from '@/lib/instance';
+import { fetchPendingPoints } from '@/app/actions';
 import { Empty } from 'antd';
 import { PointRequestCard } from '.';
 
 export async function PointRequestList() {
-  const data = await api.get('/points/list').json<{ id: string }[]>();
+  const data = await fetchPendingPoints();
 
   if (data.length === 0) {
     return (

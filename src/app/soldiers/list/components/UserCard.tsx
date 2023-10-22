@@ -15,7 +15,7 @@ export function UserCard({ type, sn, name }: UserCardProps) {
           <p className='font-bold'>
             {type === 'enlisted' ? '용사' : '간부'} {name}
           </p>
-          <p>{sn}</p>
+          <p>{'**-' + '*'.repeat(sn.length - 6) + sn.slice(-3)}</p>
         </div>
       </Card>
     </Link>

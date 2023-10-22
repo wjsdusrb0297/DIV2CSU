@@ -1,12 +1,12 @@
 'use client';
 
+import { signIn } from '@/app/actions';
+import { LockOutlined, UserOutlined } from '@ant-design/icons';
+import { Button, Form, Input } from 'antd';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useCallback, useState } from 'react';
-import { Button, Form, Input } from 'antd';
 import { withMask } from 'use-mask-input';
-import { handleSubmit } from './actions';
-import { LockOutlined, UserOutlined } from '@ant-design/icons';
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
@@ -15,7 +15,7 @@ export default function LoginPage() {
   const onSubmit = useCallback(async (form: any) => {
     setLoading(true);
     setError(null);
-    const data = await handleSubmit(form?.sn, form?.password);
+    const data = await signIn({ sn: form?.sn, password: form?.password });
     if (data?.message) {
       setError(data?.message);
     }

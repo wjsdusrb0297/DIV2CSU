@@ -1,8 +1,8 @@
-import './globals.css';
 import type { Metadata } from 'next';
-import { AntDesignRegistry } from './registry';
 import { MenuLayout } from './MenuLayout';
-import { fetchUserFromJwt } from './actions';
+import { unauthenticated_currentSoldier } from './actions';
+import './globals.css';
+import { AntDesignRegistry } from './registry';
 
 export const metadata: Metadata = {
   title: '병영생활 관리',
@@ -17,7 +17,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const data = await fetchUserFromJwt();
+  const data = await unauthenticated_currentSoldier();
   return (
     <html lang='ko'>
       <body>
