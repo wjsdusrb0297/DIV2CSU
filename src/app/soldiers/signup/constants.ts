@@ -36,6 +36,10 @@ export const ALL_PERMISSIONS: {
     key: 'PointAdmin',
     title: '상벌점에 관한 모든 권한',
   },
+  UsePoint: {
+    key: 'UsePoint',
+    title: '상점 사용 권한',
+  },
   ViewPoint: {
     key: 'ViewPoint',
     title: '유저 상점 내역 접근 권한',
