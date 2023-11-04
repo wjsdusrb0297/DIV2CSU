@@ -8,9 +8,16 @@ export const metadata: Metadata = {
   title: '병영생활 관리',
   description: '제2신속대응사단 병영생활 관리',
   authors: { name: 'Keyboard Warrior Club' },
-  viewport:
-    'width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no',
 };
+
+export function generateViewport() {
+  return {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1.0,
+    userScalable: 'no',
+  };
+}
 
 export default async function RootLayout({
   children,
