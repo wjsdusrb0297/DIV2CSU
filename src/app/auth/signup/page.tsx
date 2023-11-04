@@ -20,7 +20,7 @@ export default function SignUpPage() {
     setLoading(true);
     const data = await signUp(form);
     if (data.message) {
-      message.error('회원가입에 실패하였습니다');
+      message.error(data.message);
     }
     setLoading(false);
   }, []);

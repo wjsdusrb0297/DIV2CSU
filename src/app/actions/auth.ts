@@ -1,7 +1,6 @@
 'use server';
 
 import { Soldier } from '@/interfaces';
-import { DatabaseError } from '@planetscale/database';
 import { pbkdf2Sync, randomBytes } from 'crypto';
 import jwt from 'jsonwebtoken';
 import { NoResultError } from 'kysely';
@@ -148,10 +147,8 @@ export async function signUp(
       })
       .executeTakeFirstOrThrow();
   } catch (e) {
-    if (e instanceof DatabaseError) {
-      if (e.body.message.includes('AlreadyExists')) {
-        return { message: '이미 존재하는 사용자입니다', accessToken: null };
-      }
+    if ((e as { code: string }).code === '23505') {
+      return { message: '이미 존재하는 사용자입니다', accessToken: null };
     }
     return { message: '회원가입에 실패하였습니다', accessToken: null };
   }
