@@ -13,7 +13,6 @@ const nextConfig = {
     'rc-pagination',
     'rc-notification',
   ],
-  experimental: { serverActions: true },
 };
 
 module.exports = nextConfig;
