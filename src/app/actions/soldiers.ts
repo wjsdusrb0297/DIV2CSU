@@ -83,7 +83,7 @@ export async function verifySoldier(sn: string, value: boolean) {
   try {
     const current = await currentSoldier();
     if (
-      hasPermission(current.permissions, ['Admin', 'UserAdmin', 'VerifyUser'])
+      !hasPermission(current.permissions, ['Admin', 'UserAdmin', 'VerifyUser'])
     ) {
       return {
         success: false,
