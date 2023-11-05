@@ -1,6 +1,10 @@
 'use client';
 
-import { redeemPoint, searchPointsReceiver } from '@/app/actions';
+import {
+  fetchPointSummary,
+  redeemPoint,
+  searchPointsReceiver,
+} from '@/app/actions';
 import {
   App,
   AutoComplete,
@@ -13,7 +17,7 @@ import {
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { checkIfNco } from '../give/actions';
 
 export default function UsePointFormPage() {
@@ -26,6 +30,7 @@ export default function UsePointFormPage() {
   const [options, setOptions] = useState<{ name: string; sn: string }[]>([]);
   const [loading, setLoading] = useState(false);
   const [searching, setSearching] = useState(false);
+  const [availablePoints, setAvailablePoints] = useState<number | null>();
   const { message } = App.useApp();
 
   const renderPlaceholder = useCallback(
@@ -38,7 +43,7 @@ export default function UsePointFormPage() {
     [],
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     checkIfNco();
   }, []);
 
@@ -96,7 +101,10 @@ export default function UsePointFormPage() {
           name={'userId'}
           rules={[
             { required: true, message: '수령자를 입력해주세요' },
-            { pattern: /^[0-9]{2}-[0-9]{5,8}$/, message: '잘못된 군번입니다' },
+            {
+              pattern: /^[0-9]{2}-[0-9]{5,8}$/,
+              message: '잘못된 군번입니다',
+            },
           ]}
         >
           <AutoComplete
@@ -104,6 +112,12 @@ export default function UsePointFormPage() {
               value: t.sn,
               label: renderPlaceholder(t),
             }))}
+            onChange={async (value) => {
+              const { merit, usedMerit, demerit } = await fetchPointSummary(
+                value,
+              );
+              setAvailablePoints(merit - usedMerit + demerit);
+            }}
           >
             <Input.Search loading={searching} />
           </AutoComplete>
@@ -115,7 +129,9 @@ export default function UsePointFormPage() {
           <InputNumber
             min={1}
             controls
-            addonAfter='점'
+            addonAfter={
+              availablePoints != null ? `/ ${availablePoints}점` : '점'
+            }
             type='number'
             inputMode='numeric'
           />
