@@ -10,7 +10,6 @@ import {
   UsedPointsHorizontalList,
 } from './components';
 
-
 async function EnlistedPage({ user, page }: { user: Soldier; page: number }) {
   const { data, count, usedPoints } = await listPoints(user?.sn, page);
   return (

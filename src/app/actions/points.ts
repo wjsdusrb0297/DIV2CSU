@@ -42,7 +42,7 @@ export async function listPoints(sn: string, page: number = 0) {
         .where('user_id', '=', sn)
         .leftJoin('soldiers', 'soldiers.sn', 'used_points.recorded_by')
         .select('soldiers.name as recorded_by')
-        .selectAll()
+        .selectAll(['used_points'])
         .execute(),
   ]);
   return { data, count: parseInt(count, 10), usedPoints: usedPoints || null };

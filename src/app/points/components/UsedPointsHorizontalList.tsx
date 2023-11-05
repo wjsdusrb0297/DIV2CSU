@@ -16,9 +16,9 @@ export function UsedPointsHorizontalList({
       {(data ?? []).map((p) => (
         <Card key={p.id}>
           <Card.Meta
-            title={`${dayjs(p.created_at?.toISOString()).format(
-              'YYYY년 MM월 DD일',
-            )} - ${p.value}점`}
+            title={`${dayjs(p.created_at).format('YYYY년 MM월 DD일')} - ${
+              p.value
+            }점`}
             description={`${p.reason}`}
           />
         </Card>
