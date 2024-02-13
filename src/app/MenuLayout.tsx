@@ -75,7 +75,7 @@ export function MenuLayout({
               icon: <UserOutlined />,
               onClick,
             },
-            { key: '/', label: '홈', icon: <HomeOutlined />, onClick },
+            { key: '/home', label: '홈', icon: <HomeOutlined />, onClick },
           /*
           *홈에는 key가 설정되어있지 않기 때문에 빈화면 뜸
           -> 새로운 파일에 사진 띄우고 그걸 key로 연결하면 끝
