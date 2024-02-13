@@ -69,13 +69,20 @@ export function MenuLayout({
         : [
             {
               key: '/soldiers',
+              // key  = 다른 파일로 연결시킴
               label: data.name ?? '',
+              //얘가 마이페이지
               icon: <UserOutlined />,
               onClick,
             },
             { key: '/', label: '홈', icon: <HomeOutlined />, onClick },
+          /*
+          *홈에는 key가 설정되어있지 않기 때문에 빈화면 뜸
+          -> 새로운 파일에 사진 띄우고 그걸 key로 연결하면 끝
+          */
             {
               key: '/soldiers/#',
+              // #은 바로가기 없는거. (밑에 children 있는항목)
               label: '유저',
               icon: <UserOutlined />,
               children: [
