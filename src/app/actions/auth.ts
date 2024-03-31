@@ -21,6 +21,10 @@ const ValidateSoldierParams = Soldier.partial().pick({
   verified_at: true,
 });
 
+
+/*
+사용자 데이터를 받아와 유효성을 검사합니다. 데이터가 유효하지 않을 경우, 각 상황에 맞게 리디렉션합니다.
+*/
 export async function validateSoldier(
   data?: z.infer<typeof ValidateSoldierParams> | null,
 ) {
@@ -38,6 +42,14 @@ export async function validateSoldier(
   }
 }
 
+
+/*
+사용자 로그인을 처리합니다.
+제공된 사용자 아이디(sn)와 비밀번호(password)를 사용하여 사용자를 검색합니다.
+데이터베이스에서 사용자를 검색하고, 해당 사용자가 존재하지 않으면 적절한 메시지를 반환합니다.
+비밀번호가 일치하지 않으면 적절한 메시지를 반환합니다.
+비밀번호가 일치하면 JWT 토큰을 생성하여 반환하고, 생성된 토큰을 쿠키에 저장합니다. 이후에는 홈페이지로 리디렉션합니다.
+*/
 export async function signIn({
   sn,
   password,
@@ -114,6 +126,8 @@ export async function signIn({
   redirect('/');
 }
 
+
+
 const SignUpParams = Soldier.pick({
   sn: true,
   password: true,
@@ -121,6 +135,12 @@ const SignUpParams = Soldier.pick({
   name: true,
 });
 
+
+/*
+새로운 사용자 회원가입을 처리합니다.
+제공된 데이터를 사용하여 새로운 사용자를 생성하고, 해당 사용자가 이미 존재하는 경우 적절한 메시지를 반환합니다.
+비밀번호는 해싱하여 저장하고, 회원가입이 성공하면 적절한 메시지를 반환하고 이후 인증 페이지로 리디렉션합니다.
+*/
 export async function signUp(
   form: z.infer<typeof SignUpParams>,
 ): Promise<{ message: string | null; accessToken: string | null }> {
@@ -183,6 +203,12 @@ export async function signUp(
   redirect('/auth/needVerification');
 }
 
+
+/*
+사용자 비밀번호 재설정을 처리합니다.
+제공된 사용자 아이디(sn), 이전 비밀번호(oldPassword), 새 비밀번호(newPassword) 및 확인용 비밀번호(confirmation)를 사용하여 비밀번호 재설정을 수행합니다.
+잘못된 비밀번호, 일치하지 않는 새 비밀번호 및 확인용 비밀번호 등에 대해 적절한 메시지를 반환합니다.
+*/
 export async function resetPassword({
   sn,
   oldPassword,
@@ -239,6 +265,12 @@ export async function resetPassword({
     .executeTakeFirstOrThrow();
 }
 
+
+/*
+관리자가 특정 사용자의 비밀번호를 강제로 재설정하는 경우를 처리합니다.
+요청한 사용자의 권한을 확인하고, 권한이 없거나 요청한 사용자 자신의 경우 적절한 메시지를 반환합니다.
+새로운 랜덤 비밀번호를 생성하여 해당 사용자의 비밀번호를 강제로 재설정하고, 새로 생성된 비밀번호를 반환합니다.
+*/
 export async function resetPasswordForce(sn: string) {
   const current = await currentSoldier();
   if (
@@ -270,6 +302,11 @@ export async function resetPasswordForce(sn: string) {
   }
 }
 
+
+/*
+사용자 로그아웃을 처리합니다.
+쿠키에서 인증 토큰을 삭제하고, 홈페이지로 리디렉션합니다.
+*/
 export async function signOut() {
   cookies().delete('auth.access_token');
   revalidatePath('/', 'layout');
