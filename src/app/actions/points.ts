@@ -5,6 +5,12 @@ import { kysely } from './kysely';
 import { currentSoldier, fetchSoldier } from './soldiers';
 import { checkIfSoldierHasPermission, hasPermission } from './utils';
 
+
+/*
+특정 상벌점의 세부 정보를 가져옵니다.
+points 테이블에서 id를 사용하여 해당 상벌점을 검색합니다.
+상벌점을 주고 받은 군인의 이름을 가져오기 위해 soldiers 테이블과 조인합니다.
+*/
 export async function fetchPoint(pointId: number) {
   return kysely
     .selectFrom('points')
@@ -16,6 +22,12 @@ export async function fetchPoint(pointId: number) {
     .executeTakeFirst();
 }
 
+
+/*
+특정 사용자에 대한 상벌점 목록을 가져옵니다.
+사용자의 유형에 따라 receiver_id 또는 giver_id를 사용하여 해당 사용자가 받은 또는 준 상벌점을 검색합니다.
+페이지네이션을 지원하며, 기본적으로 첫 번째 페이지를 반환합니다.
+*/
 export async function listPoints(sn: string, page: number = 0) {
   const { type } = await kysely
     .selectFrom('soldiers')
@@ -48,6 +60,11 @@ export async function listPoints(sn: string, page: number = 0) {
   return { data, count: parseInt(count, 10), usedPoints: usedPoints || null };
 }
 
+
+/*
+현재 로그인한 군인이 주는 상벌점 중에서 아직 검토되지 않은 상벌점 목록을 가져옵니다.
+로그인한 군인의 군번(sn)을 기준으로 검색합니다.
+*/
 export async function fetchPendingPoints() {
   const { sn } = await currentSoldier();
   return kysely
@@ -58,6 +75,11 @@ export async function fetchPendingPoints() {
     .execute();
 }
 
+
+/*
+특정 상벌점을 삭제합니다.
+해당 상벌점의 소유자에 대한 확인 및 권한 검사를 수행합니다.
+*/
 export async function deletePoint(pointId: number) {
   const { type, sn } = await currentSoldier();
   if (type === 'nco') {
@@ -84,6 +106,11 @@ export async function deletePoint(pointId: number) {
   return { message: null };
 }
 
+
+/*
+특정 상벌점의 검토를 승인하거나 거부합니다.
+군인이 자신에게 주어진 상벌점을 확인하고, 승인 또는 거부할 수 있습니다.
+*/
 export async function verifyPoint(
   pointId: number,
   value: boolean,
@@ -130,6 +157,11 @@ export async function verifyPoint(
   }
 }
 
+
+/*
+특정 사용자에 대한 상벌점 요약 정보를 가져옵니다.
+사용자가 받은 상점, 받은 벌점 및 사용한 상점의 총계를 계산합니다.
+*/
 export async function fetchPointSummary(sn: string) {
   const pointsQuery = kysely.selectFrom('points').where('receiver_id', '=', sn);
   const usedPointsQuery = kysely
@@ -156,6 +188,11 @@ export async function fetchPointSummary(sn: string) {
   };
 }
 
+
+/*
+새로운 상벌점을 만듭니다.
+주는 사람과 받는 사람에 대한 확인 및 권한 검사를 수행합니다.
+*/
 export async function createPoint({
   value,
   giverId,
@@ -234,6 +271,11 @@ export async function createPoint({
   }
 }
 
+
+/*
+상벌점을 사용합니다.
+군인이 자신의 상벌점을 사용하거나 특정 군인에게 상벌점을 부여할 수 있습니다.
+*/
 export async function redeemPoint({
   value,
   userId,
@@ -308,6 +350,11 @@ export async function redeemPoint({
   }
 }
 
+
+/*
+상벌점 템플릿을 가져옵니다.
+이 함수는 상벌점을 만들 때 사용되는 템플릿 데이터를 반환합니다.
+*/
 export async function fetchPointTemplates() {
   return kysely.selectFrom('point_templates').selectAll().execute();
 }
