@@ -9,6 +9,12 @@ import { validateSoldier } from './auth';
 import { kysely } from './kysely';
 import { hasPermission } from './utils';
 
+
+/*
+현재 인증되지 않은 군인의 정보를 가져옵니다.
+접근 토큰(cookie로부터)을 확인하여 사용자를 식별합니다.
+JWT 토큰을 검증하고, 유효한 경우 해당 군인의 정보를 반환합니다.
+*/
 export async function unauthenticated_currentSoldier() {
   const accessToken = cookies().get('auth.access_token')?.value;
   if (accessToken == null) {
@@ -31,12 +37,23 @@ export async function unauthenticated_currentSoldier() {
   return soldier;
 }
 
+
+/*
+현재 인증된 군인의 정보를 가져옵니다.
+unauthenticated_currentSoldier 함수를 호출하여 사용자를 인증하고, 인증된 경우 유효성을 검사합니다.
+*/
 export async function currentSoldier() {
   const soldier = await unauthenticated_currentSoldier();
   await validateSoldier(soldier);
   return soldier!;
 }
 
+
+/*
+특정 군인의 정보를 가져옵니다.
+군번(sn)을 사용하여 soldiers 테이블에서 해당 군인의 정보를 조회합니다.
+사용자의 권한 정보도 함께 가져옵니다.
+*/
 export const fetchSoldier = cache(async (sn: string) => {
   const data = await kysely
     .selectFrom('soldiers')
@@ -64,6 +81,12 @@ export const fetchSoldier = cache(async (sn: string) => {
   };
 });
 
+
+/*
+승인되지 않은 군인 목록을 가져옵니다.
+현재 로그인한 군인이 관리자 또는 사용자 관리 권한이 있는지 확인합니다.
+verified_at이 null인 군인 목록을 조회합니다.
+*/
 export async function listUnverifiedSoldiers() {
   const current = await currentSoldier();
   if (
@@ -79,6 +102,12 @@ export async function listUnverifiedSoldiers() {
   return { message: null, data };
 }
 
+
+/*
+특정 군인의 승인 또는 거부를 처리합니다.
+현재 로그인한 군인이 관리자 또는 사용자 관리 권한이 있는지 확인합니다.
+soldiers 테이블에서 해당 군인의 정보를 업데이트하여 승인 또는 거부 상태를 반영합니다.
+*/
 export async function verifySoldier(sn: string, value: boolean) {
   try {
     const current = await currentSoldier();
@@ -108,6 +137,12 @@ export async function verifySoldier(sn: string, value: boolean) {
   }
 }
 
+
+/*
+군인 목록을 가져옵니다.
+현재 로그인한 군인이 관리자인 경우 모든 군인을, 그렇지 않은 경우 승인된 군인만 조회합니다.
+검색 쿼리와 페이지네이션을 지원합니다.
+*/
 export async function listSoldiers({
   query,
   page,
@@ -140,6 +175,11 @@ export async function listSoldiers({
   return { count: parseInt(count, 10), data };
 }
 
+
+/*
+상벌점의 수신자 및 발신자를 검색합니다.
+주어진 검색어와 일치하는 군인을 조회하고, 상벌점 관리자 권한을 가진 군인만 발신자로 검색됩니다.
+*/
 export async function searchPointsReceiver(query: string) {
   return kysely
     .selectFrom('soldiers')
@@ -160,6 +200,11 @@ export async function searchPointsReceiver(query: string) {
     .execute();
 }
 
+
+/*
+상벌점의 수신자 및 발신자를 검색합니다.
+주어진 검색어와 일치하는 군인을 조회하고, 상벌점 관리자 권한을 가진 군인만 발신자로 검색됩니다.
+*/
 export async function searchPointsGiver(query: string) {
   return kysely
     .selectFrom('soldiers')
@@ -195,6 +240,12 @@ export async function searchPointsGiver(query: string) {
     .execute();
 }
 
+
+/*
+특정 군인을 삭제합니다.
+현재 로그인한 군인이 관리자이며, 권한이 충분한 경우에만 실행됩니다.
+deleted_at을 설정하여 삭제된 군인을 표시합니다.
+*/
 export async function deleteSoldier({
   sn,
   value,
