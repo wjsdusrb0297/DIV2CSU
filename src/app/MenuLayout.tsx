@@ -37,9 +37,19 @@ function renderTitle(pathname: string) {
   return '병영생활 관리';
 }
 
+
+/*
+사용자가 로그인한 상태에서 메뉴 레이아웃을 표시합니다.
+사용자가 로그인하지 않은 경우, 로그인 페이지로 리다이렉션합니다.
+사용자의 상태와 권한에 따라 메뉴 항목을 동적으로 렌더링합니다.
+*/
 export function MenuLayout({
   data,
   children,
+  /*
+  -data: currentSoldier 함수에서 반환된 사용자 데이터입니다. 사용자가 로그인하지 않은 경우 null입니다.
+  -children: 메뉴 레이아웃 내의 자식 컴포넌트입니다.
+  */
 }: {
   data: Awaited<ReturnType<typeof currentSoldier>> | null;
   children: React.ReactNode;
@@ -63,6 +73,12 @@ export function MenuLayout({
   }, [router]);
 
   const items: MenuProps['items'] = useMemo(
+    /*
+    사용자의 권한과 상태를 기반으로 메뉴 항목을 동적으로 렌더링합니다.
+    items 배열에는 각 메뉴 항목의 정보가 포함되어 있습니다. 이 정보는 사용자의 권한에 따라 다르게 설정됩니다.
+    각 메뉴 항목은 특정 경로와 연결되어 있으며, 클릭시 해당 경로로 이동합니다.
+    일부 메뉴 항목은 특정 권한을 가진 사용자만 접근할 수 있도록 설정되어 있습니다.
+    */
     () =>
       data == null
         ? []
